@@ -6,6 +6,12 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		BAB70C5C2D32E812005FF767 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BAB70C5B2D32E812005FF767 /* WidgetKit.framework */; };
+		BAB70C5E2D32E812005FF767 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BAB70C5D2D32E812005FF767 /* SwiftUI.framework */; };
+		BAB70C692D32E813005FF767 /* HydroHabitWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = BAB70C592D32E812005FF767 /* HydroHabitWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		BAB70C392D32E7FF005FF767 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -21,13 +27,57 @@
 			remoteGlobalIDString = BAB70C272D32E7FD005FF767;
 			remoteInfo = HydroHabit2;
 		};
+		BAB70C672D32E813005FF767 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BAB70C202D32E7FD005FF767 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = BAB70C582D32E812005FF767;
+			remoteInfo = HydroHabitWidgetExtension;
+		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		BAB70C6E2D32E813005FF767 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				BAB70C692D32E813005FF767 /* HydroHabitWidgetExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
-		BAB70C282D32E7FD005FF767 /* HydroHabit2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HydroHabit2.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		BAB70C282D32E7FD005FF767 /* HydroHabit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HydroHabit.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BAB70C382D32E7FF005FF767 /* HydroHabit2Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HydroHabit2Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		BAB70C422D32E7FF005FF767 /* HydroHabit2UITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HydroHabit2UITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		BAB70C592D32E812005FF767 /* HydroHabitWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = HydroHabitWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		BAB70C5B2D32E812005FF767 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		BAB70C5D2D32E812005FF767 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		BAB70C702D32E84A005FF767 /* HydroHabitWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = HydroHabitWidgetExtension.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		BAB70C6A2D32E813005FF767 /* Exceptions for "HydroHabitWidget" folder in "HydroHabitWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = BAB70C582D32E812005FF767 /* HydroHabitWidgetExtension */;
+		};
+		BAB70C762D32EC56005FF767 /* Exceptions for "HydroHabitWidget" folder in "HydroHabit2" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				WaterEntry.swift,
+				WaterProvider.swift,
+				WaterWidgetView.swift,
+			);
+			target = BAB70C272D32E7FD005FF767 /* HydroHabit2 */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		BAB70C2A2D32E7FD005FF767 /* HydroHabit2 */ = {
@@ -43,6 +93,15 @@
 		BAB70C452D32E7FF005FF767 /* HydroHabit2UITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = HydroHabit2UITests;
+			sourceTree = "<group>";
+		};
+		BAB70C5F2D32E812005FF767 /* HydroHabitWidget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				BAB70C762D32EC56005FF767 /* Exceptions for "HydroHabitWidget" folder in "HydroHabit2" target */,
+				BAB70C6A2D32E813005FF767 /* Exceptions for "HydroHabitWidget" folder in "HydroHabitWidgetExtension" target */,
+			);
+			path = HydroHabitWidget;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -69,15 +128,27 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		BAB70C562D32E812005FF767 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BAB70C5E2D32E812005FF767 /* SwiftUI.framework in Frameworks */,
+				BAB70C5C2D32E812005FF767 /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		BAB70C1F2D32E7FD005FF767 = {
 			isa = PBXGroup;
 			children = (
+				BAB70C702D32E84A005FF767 /* HydroHabitWidgetExtension.entitlements */,
 				BAB70C2A2D32E7FD005FF767 /* HydroHabit2 */,
 				BAB70C3B2D32E7FF005FF767 /* HydroHabit2Tests */,
 				BAB70C452D32E7FF005FF767 /* HydroHabit2UITests */,
+				BAB70C5F2D32E812005FF767 /* HydroHabitWidget */,
+				BAB70C5A2D32E812005FF767 /* Frameworks */,
 				BAB70C292D32E7FD005FF767 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -85,11 +156,21 @@
 		BAB70C292D32E7FD005FF767 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				BAB70C282D32E7FD005FF767 /* HydroHabit2.app */,
+				BAB70C282D32E7FD005FF767 /* HydroHabit.app */,
 				BAB70C382D32E7FF005FF767 /* HydroHabit2Tests.xctest */,
 				BAB70C422D32E7FF005FF767 /* HydroHabit2UITests.xctest */,
+				BAB70C592D32E812005FF767 /* HydroHabitWidgetExtension.appex */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		BAB70C5A2D32E812005FF767 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				BAB70C5B2D32E812005FF767 /* WidgetKit.framework */,
+				BAB70C5D2D32E812005FF767 /* SwiftUI.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -102,10 +183,12 @@
 				BAB70C242D32E7FD005FF767 /* Sources */,
 				BAB70C252D32E7FD005FF767 /* Frameworks */,
 				BAB70C262D32E7FD005FF767 /* Resources */,
+				BAB70C6E2D32E813005FF767 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				BAB70C682D32E813005FF767 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				BAB70C2A2D32E7FD005FF767 /* HydroHabit2 */,
@@ -114,7 +197,7 @@
 			packageProductDependencies = (
 			);
 			productName = HydroHabit2;
-			productReference = BAB70C282D32E7FD005FF767 /* HydroHabit2.app */;
+			productReference = BAB70C282D32E7FD005FF767 /* HydroHabit.app */;
 			productType = "com.apple.product-type.application";
 		};
 		BAB70C372D32E7FF005FF767 /* HydroHabit2Tests */ = {
@@ -163,6 +246,28 @@
 			productReference = BAB70C422D32E7FF005FF767 /* HydroHabit2UITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
+		BAB70C582D32E812005FF767 /* HydroHabitWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BAB70C6B2D32E813005FF767 /* Build configuration list for PBXNativeTarget "HydroHabitWidgetExtension" */;
+			buildPhases = (
+				BAB70C552D32E812005FF767 /* Sources */,
+				BAB70C562D32E812005FF767 /* Frameworks */,
+				BAB70C572D32E812005FF767 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				BAB70C5F2D32E812005FF767 /* HydroHabitWidget */,
+			);
+			name = HydroHabitWidgetExtension;
+			packageProductDependencies = (
+			);
+			productName = HydroHabitWidgetExtension;
+			productReference = BAB70C592D32E812005FF767 /* HydroHabitWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -184,6 +289,9 @@
 						CreatedOnToolsVersion = 16.2;
 						TestTargetID = BAB70C272D32E7FD005FF767;
 					};
+					BAB70C582D32E812005FF767 = {
+						CreatedOnToolsVersion = 16.2;
+					};
 				};
 			};
 			buildConfigurationList = BAB70C232D32E7FD005FF767 /* Build configuration list for PBXProject "HydroHabit2" */;
@@ -195,6 +303,8 @@
 			);
 			mainGroup = BAB70C1F2D32E7FD005FF767;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = BAB70C292D32E7FD005FF767 /* Products */;
 			projectDirPath = "";
@@ -203,6 +313,7 @@
 				BAB70C272D32E7FD005FF767 /* HydroHabit2 */,
 				BAB70C372D32E7FF005FF767 /* HydroHabit2Tests */,
 				BAB70C412D32E7FF005FF767 /* HydroHabit2UITests */,
+				BAB70C582D32E812005FF767 /* HydroHabitWidgetExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -223,6 +334,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		BAB70C402D32E7FF005FF767 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BAB70C572D32E812005FF767 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -253,6 +371,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		BAB70C552D32E812005FF767 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -265,6 +390,11 @@
 			isa = PBXTargetDependency;
 			target = BAB70C272D32E7FD005FF767 /* HydroHabit2 */;
 			targetProxy = BAB70C432D32E7FF005FF767 /* PBXContainerItemProxy */;
+		};
+		BAB70C682D32E813005FF767 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = BAB70C582D32E812005FF767 /* HydroHabitWidgetExtension */;
+			targetProxy = BAB70C672D32E813005FF767 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -393,8 +523,9 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = HydroHabit2/HydroHabit2.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 9;
 				DEVELOPMENT_ASSET_PATHS = "\"HydroHabit2/Preview Content\"";
 				DEVELOPMENT_TEAM = 52R8C57Y3B;
 				ENABLE_PREVIEWS = YES;
@@ -402,15 +533,15 @@
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UIRequiresFullScreen = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = AdamHeidmann.HydroHabit2;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				MARKETING_VERSION = 1.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = AdamHeidmann.HydroHabit;
+				PRODUCT_NAME = HydroHabit;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -422,8 +553,9 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = HydroHabit2/HydroHabit2.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 9;
 				DEVELOPMENT_ASSET_PATHS = "\"HydroHabit2/Preview Content\"";
 				DEVELOPMENT_TEAM = 52R8C57Y3B;
 				ENABLE_PREVIEWS = YES;
@@ -431,15 +563,15 @@
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UIRequiresFullScreen = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = AdamHeidmann.HydroHabit2;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				MARKETING_VERSION = 1.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = AdamHeidmann.HydroHabit;
+				PRODUCT_NAME = HydroHabit;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -518,6 +650,62 @@
 			};
 			name = Release;
 		};
+		BAB70C6C2D32E813005FF767 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = HydroHabitWidgetExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 9;
+				DEVELOPMENT_TEAM = 52R8C57Y3B;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = HydroHabitWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = HydroHabitWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = AdamHeidmann.HydroHabit.HydroHabitWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		BAB70C6D2D32E813005FF767 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = HydroHabitWidgetExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 9;
+				DEVELOPMENT_TEAM = 52R8C57Y3B;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = HydroHabitWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = HydroHabitWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = AdamHeidmann.HydroHabit.HydroHabitWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -553,6 +741,15 @@
 			buildConfigurations = (
 				BAB70C532D32E7FF005FF767 /* Debug */,
 				BAB70C542D32E7FF005FF767 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		BAB70C6B2D32E813005FF767 /* Build configuration list for PBXNativeTarget "HydroHabitWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BAB70C6C2D32E813005FF767 /* Debug */,
+				BAB70C6D2D32E813005FF767 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
