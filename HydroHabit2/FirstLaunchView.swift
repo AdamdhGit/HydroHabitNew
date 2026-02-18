@@ -20,50 +20,149 @@ struct FirstLaunchView: View {
     @State var customGoalAmount = ""
     @Binding var goalAmount: Double
     
+    let genderTypes = ["Male", "Female"]
+    @State var selectedGender: String = "Male"
+    
+    @State private var selectedTab: Int = 0
+    
     var body: some View {
         
         ZStack {
+            backgroundColor.ignoresSafeArea()
+           
             
-            backgroundColor.edgesIgnoringSafeArea(.all)
-            
-            ScrollView {
+            TabView (selection: $selectedTab)  {
                 
-                VStack {
+           
                     
-                    hydroHabitIntroText
+                ZStack{
+                  
+                    VStack{
+                        
+                        hydroHabitIntroText
+                        
+                        Image("waterDrop")
+                            .resizable()
+                            .frame(width: 300, height: 300)
+                           
+                        
+                        Button("Next"){
+                            selectedTab = 1
+                        }
+                    }
                     
-                    howWouldYouLikeToMeasureText
-                    
-                    unitTypePicker
-                    
-                    selectIntakeGoalText
-
-                    intakeGoalPicker
-
-                    customGoalEntryView
-
-                    getStartedButton
-                    
-                    Divider().padding(.top, 30)
-                    
-                    intakeDisclaimerText
-                    
-                    Spacer()
-                    
-                }.padding(.top, 70).preferredColorScheme(.dark).padding(.horizontal)
+                }.tag(0).contentShape(Rectangle())
+                    .gesture(DragGesture())
                 
-            }
+                ZStack{
+                  
+                    VStack{
+                        Button{
+                            selectedTab = 0
+                        }label:{
+                            Image(systemName: "chevron.left")
+                        }
+                        Text("Pick your gender")
+                        genderPicker
+                        Button("Next"){
+                            selectedTab = 2
+                        }
+                    }
+                }.tag(1).contentShape(Rectangle())
+                    .gesture(DragGesture())
+                
+                ZStack{
+                   
+                    
+                    VStack{
+                        Button{
+                            selectedTab = 1
+                        }label:{
+                            Image(systemName: "chevron.left")
+                        }
+                        
+                        howWouldYouLikeToMeasureText
+                        
+                        unitTypePicker
+                        
+                        Button("Next"){
+                            selectedTab = 3
+                        }
+                    }
+                }.tag(2).contentShape(Rectangle())
+                    .gesture(DragGesture())
+                
+                ZStack{
+                 
+                    
+                    VStack{
+                        
+                        Button{
+                            selectedTab = 2
+                        }label:{
+                            Image(systemName: "chevron.left")
+                        }
+                        
+                        selectIntakeGoalText
+                        
+                        intakeGoalPicker
+                        
+                        customGoalEntryView
+                        
+                        intakeDisclaimerText
+                        
+                        Button("Next"){
+                            selectedTab = 4
+                        }
+                    }
+                }.tag(3).contentShape(Rectangle())
+                    .gesture(DragGesture())
+
+                   
+                ZStack{
+                   
+                    VStack{
+                        
+                        Button{
+                            selectedTab = 3
+                        }label:{
+                            Image(systemName: "chevron.left")
+                        }
+                        startHydratingButton
+                        
+                    }
+                }.tag(4).contentShape(Rectangle())
+                    .gesture(DragGesture())
+                    
+                 
+                    
+                 
+                    
+                
+                
+            }.tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
+            // hides dots
+             
         }
     }
     
     //MARK: Views and Functions
     
     var hydroHabitIntroText: some View {
-        Text("Stay hydrated and build the habit - with HydroHabit.").foregroundStyle(.cyan).fontWeight(.light).font(.title2).padding(.horizontal)
+        Text("Stay hydrated and build the habit - with HydroHabit.").foregroundStyle(.white).fontWeight(.light).font(.title2).padding(.horizontal)
     }
     
     var howWouldYouLikeToMeasureText: some View {
-        Text("How would you like to measure your water intake?").padding(.top, 30).foregroundStyle(.gray)
+        Text("How would you like to measure your water intake?").padding(.top, 30).foregroundStyle(.white)
+    }
+    
+    var genderPicker: some View {
+        Picker("Gender", selection: $selectedGender) {
+            ForEach(genderTypes, id: \.self){i in
+                Text(i)
+                
+            }
+        }.pickerStyle(.segmented)
     }
     
     var unitTypePicker: some View {
@@ -76,7 +175,7 @@ struct FirstLaunchView: View {
     }
     
     var selectIntakeGoalText: some View {
-        Text("Select Your Daily Intake Goal").padding(.top, 30).foregroundStyle(.gray)
+        Text("Select Your Daily Intake Goal").padding(.top, 30).foregroundStyle(.white)
     }
     
     var intakeGoalPicker: some View {
@@ -95,7 +194,7 @@ struct FirstLaunchView: View {
                     }
             }
             
-            }.pickerStyle(.wheel).frame(height: 140)
+            }.pickerStyle(.segmented)
             .onChange(of: dailyGoal) { oldValue, newValue in
                 print(dailyGoal)
             }
@@ -117,7 +216,7 @@ struct FirstLaunchView: View {
                 
                 VStack {
                     
-                    Text("Enter Your Daily Intake Goal in \(selectedUnitType)").foregroundStyle(.gray)
+                    Text("Enter Your Daily Intake Goal in \(selectedUnitType)").foregroundStyle(.white)
                     
                     ZStack {
                         
@@ -165,18 +264,26 @@ struct FirstLaunchView: View {
     }
     
     var intakeDisclaimerText: some View {
-        Text("General intake estimates based on 'National Academies of Sciences, Engineering, and Medicine. Dietary Reference Intakes for Water, Potassium, Sodium, Chloride, and Sulfate (2005)' - for more specific recommendations, consult your doctor.").foregroundStyle(.gray).font(.caption).padding(.top, 20)
+        Text("General intake estimates based on 'National Academies of Sciences, Engineering, and Medicine. Dietary Reference Intakes for Water, Potassium, Sodium, Chloride, and Sulfate (2005)' - for more specific recommendations, consult your doctor.").foregroundStyle(.white).opacity(0.5).font(.caption).padding(.top, 20)
     }
     
-    var backgroundColor: Color {
-        Color(red: 0.06, green: 0.06, blue: 0.06)
+    var backgroundColor: LinearGradient {
+        LinearGradient(
+            colors: [
+                Color(red: 0.12, green: 0.45, blue: 0.95),   // rich blue
+                Color(red: 0.10, green: 0.12, blue: 0.35)    // deeper blue
+            ],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+        
     }
     
-    var getStartedButton: some View {
-        Button("Get Started"){
+    var startHydratingButton: some View {
+        Button("Start Hydrating"){
            saveGoalAmount()
            setupFinished = true
-        }.buttonStyle(.borderedProminent).tint(.black).opacity(0.7).padding(.top, 15).disabled(dailyGoal == "Custom Goal" && customGoalAmount.isEmpty ? true : false)
+        }.buttonStyle(.borderedProminent).tint(.black).padding(.top, 15).disabled(dailyGoal == "Custom Goal" && customGoalAmount.isEmpty ? true : false)
     }
 }
 

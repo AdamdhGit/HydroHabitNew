@@ -13,6 +13,8 @@ import WidgetKit
 
 struct ContentView: View {
     
+    @AppStorage("waterAmount") var waterAmount: Double = 0.0
+    
     @Environment(\.requestReview) var requestReview
     @AppStorage("waterLogCount") var waterLogCount = 0
     @State var editGoalSheetShowing = false
@@ -26,12 +28,6 @@ struct ContentView: View {
     @State var buttonPressed = false
     @State var recentIsSaved = false
     @State var recentWaterAmountSaved:Double = 0
-    @State var showDecimalDisclaimer = false
-    @State var widgetGoalPercentage: Double = UserDefaults(suiteName: "group.HydroHabit")?.double(forKey: "widgetGoalPercentage") ?? 0
-    @State var widgetSelectedUnit: String = UserDefaults(suiteName: "group.HydroHabit")?.string(forKey: "widgetSelectedUnit") ?? "oz"
-    @AppStorage("waterAmount") var waterAmount: Double = 0
-    @State var widgetWaterAmount:Double = UserDefaults(suiteName: "group.HydroHabit")?.double(forKey: "widgetWaterAmount") ?? 0
-    @State var widgetGoalAmount:Double = UserDefaults(suiteName: "group.HydroHabit")?.double(forKey: "widgetGoalAmount") ?? 0
     @Binding var goalAmount: Double
     @AppStorage("goalScaleAnimationHasBeenShown") var goalScaleAnimationHasBeenShown = false
     @State var isAnimating = false
@@ -128,7 +124,11 @@ struct ContentView: View {
                             
                             hydroHabitTitleText
                             
-                            changeWaterUnitPicker
+                            
+                            HStack{
+                                Spacer()
+                                changeWaterUnitPicker
+                            }
                             
                         }
                         
@@ -138,7 +138,7 @@ struct ContentView: View {
                                 .onChange(of: buttonPressed) { _,_ in
                                     disableAllButtons = true
                                     animateButtonsAndProgressCircle()
-                                    print("\(widgetGoalPercentage)")
+                                   
                                     
                                 }
                                 .onAppear{
@@ -157,7 +157,6 @@ struct ContentView: View {
                                         setAllDataOnAppear()
                                         animatedProgress = (waterAmount / goalAmount)
                                         
-                                        showDecimalDisclaimer = false
                                         recentIsSaved = false
                                         
                                     }
@@ -200,9 +199,9 @@ struct ContentView: View {
                         
                         HStack {
                             
-                            Spacer()
+                           
                             
-                          customAmountSliders
+                            customAmountSliders.tint(.cyan)
                             
                             Spacer()
                             
@@ -242,47 +241,26 @@ struct ContentView: View {
                             
                         }.padding(.top, -7)
                         
-                        if showDecimalDisclaimer {
-                            
-                            decimalDisclaimerText
-                            
-                        }
-                        
                         Spacer()
                         
                     }.preferredColorScheme(.dark)
-                        .onChange(of: selectedUnitType, { oldValue, newValue in
-                           setDefaultCustomAmountOnUnitChange()
-                        })
-                        .onChange(of: selectedUnitType, { oldValue, newValue in
-                            updateAmountsAfterUnitConversion(oldValue: oldValue, newValue: newValue)
-                            saveWaterAmountToWidget()
-                        })
+                        .onChange(of: selectedUnitType) { oldValue, newValue in
+                      
+                                setDefaultCustomAmountOnUnitChange()
+                                updateAmountsAfterUnitConversion(oldValue: oldValue, newValue: newValue)
+                                
+                                recentIsSaved = false
+                                
+                                
+                            
+                            saveAllWidgetData()
+                        }
+                    //
+                       
                         .sheet(isPresented: $editGoalSheetShowing, content: {
                             ChangeGoalView(selectedUnitType: $selectedUnitType, goalAmount: $goalAmount)
                         })
-
-                        .onChange(of: waterAmount) { oldValue, newValue in
-                            widgetWaterAmount = waterAmount
-                            saveWaterAmountToWidget()
-                        }
-                        .onChange(of: goalAmount) { _, _ in
-                            widgetGoalAmount = goalAmount
-                           
-                            saveWidgetGoalAmount()
-                        }
-                        .onChange(of: goalPercent) { _, _ in
-                            widgetGoalPercentage = goalPercent
-                            saveWidgetGoalPercentage()
-                        }
-                        .onChange(of: selectedUnitType) { _, _ in
-                            widgetSelectedUnit = selectedUnitType
-                            saveWidgetSelectedUnit()
-                            recentIsSaved = false
-                        }
-                        .onChange(of: selectedUnitType) { _, _ in
-                                showDecimalDisclaimer = true
-                        }
+                        
                 }
                 .padding()
                 
@@ -304,19 +282,17 @@ struct ContentView: View {
     
     //format the number displayed
     func displayUnitWithPrefixes(amount: Double) -> String {
-        if selectedUnitType == "oz" {
-            //MARK: DECIMALS ARE OK. **people wont convert constantly in the first place. but if they do, they will get an exact conversion for that day. new day, fresh start at 0, only whole number adds of that unit type.
-            let stringOz = String(format: "%g", amount).prefix(6)
-            //allows two decimal points, in case first is a zero, to make sense of a 99.99% for example.
-            return String(stringOz)
-        } else if selectedUnitType == "L" {
-            let stringL = String(format: "%g", amount).prefix(6)
-            return String(stringL)
-        } else if selectedUnitType == "mL" {
-            let stringmL = String(format: "%g", amount).prefix(7)
-            return String(stringmL)
+        switch selectedUnitType {
+        case "L":
+            // Shows up to 2 decimals for Liters (e.g., 1.75)
+            return amount.formatted(.number.precision(.fractionLength(0...2)))
+        case "mL":
+            // No decimals for mL, with thousands separator (e.g., 1,500)
+            return amount.formatted(.number.precision(.fractionLength(0)))
+        default: // "oz"
+            // Up to 1 decimal for oz to handle conversions cleanly
+            return amount.formatted(.number.precision(.fractionLength(0...1)))
         }
-        return "oz"
     }
     
     func displayUnitType() -> String {
@@ -330,37 +306,56 @@ struct ContentView: View {
         return "oz"
     }
     
-    var backgroundColor: Color {
-        Color(red: 0.06, green: 0.06, blue: 0.06)
+    var backgroundColor: LinearGradient {
+        LinearGradient(
+            colors: [
+                Color(red: 0.12, green: 0.45, blue: 0.95),   // rich blue
+                Color(red: 0.10, green: 0.12, blue: 0.35)    // deeper blue
+            ],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+        
     }
     
     var hydroHabitTitleText: some View {
-        Text("HydroHabit").foregroundStyle(.cyan).fontWeight(.light).font(.title2).opacity(0.9)
+        Text("HydroHabit").foregroundStyle(.cyan).font(.title2).opacity(0.9)
     }
     
     var changeWaterUnitPicker: some View {
-        HStack{
-            
-            Spacer()
-            
-            Menu {
-                
-                Picker("Water Unit Type", selection: $selectedUnitType, content: {
-                    ForEach(waterUnits, id: \.self){i in
-                        Text(i)
-                        
-                    }
-                })
-            }label:{
+        Menu {
+            Picker("Water Unit Type", selection: $selectedUnitType) {
+                ForEach(waterUnits, id: \.self) { i in
+                    Text(i).tag(i)
+                }
+            }
+        } label: {
+            // Use a fixed-width container for the label
+            HStack(spacing: 2) {
                 Text(selectedUnitType)
-                Image(systemName: "chevron.up.chevron.down")
-            }.foregroundStyle(.gray).opacity(0.7)
-            
+                    .font(.body)
+                    .fontWeight(.medium)
+                    // This ID forces SwiftUI to "snap" the text change
+                    // instead of animating the characters
+                    .id(selectedUnitType)
+                
+                Image(systemName: "chevron.down")
+                    .font(.caption2)
+            }
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background(Color.white.opacity(0.001)) // Increases tap area without visual change
+            .frame(width: 60, alignment: .trailing) // THE FIX: Absolute width
+        }
+        .tint(.cyan)
+        // This prevents the "Drawing" animation from stuttering
+        .transaction { transaction in
+            transaction.animation = nil
         }
     }
     
     var quickAddText: some View {
-        Text("Quick Add").foregroundStyle(Color(red: 0.5, green: 0.5, blue: 0.5))
+        Text("Quick Add").foregroundStyle(.white)
     }
     
     var undoRecentButton: some View {
@@ -369,7 +364,7 @@ struct ContentView: View {
             //undo recent
             waterAmount -= recentWaterAmountSaved
             
-            saveWaterAmountToWidget()
+            saveAllWidgetData()
             
             recentIsSaved = false
             
@@ -383,16 +378,16 @@ struct ContentView: View {
             
             Text("Undo Recent")
             
-        }.font(.footnote).foregroundStyle(Color(red: 0.4, green: 0.4, blue: 0.4))
+        }.font(.footnote).foregroundStyle(.white)
         
     }
     
     var customAmountText: some View {
-        Text("Custom Amount").foregroundStyle(Color(red: 0.5, green: 0.5, blue: 0.5))
+        Text("Custom Amount").foregroundStyle(.white)
     }
     
     var progressTodayText: some View {
-        Text("Progress Today").foregroundStyle(Color(red: 0.4, green: 0.4, blue: 0.4)).bold()
+        Text("Progress Today").foregroundStyle(.white)
     }
     
     var editGoalButton: some View {
@@ -405,7 +400,7 @@ struct ContentView: View {
             Image(systemName: "pencil")
             Text("Edit Goal")
             
-        }.font(.footnote).padding(.horizontal).foregroundStyle(Color(red: 0.4, green: 0.4, blue: 0.4))
+        }.font(.footnote).padding(.horizontal).foregroundStyle(.white)
         
     }
     
@@ -413,47 +408,8 @@ struct ContentView: View {
         Text("\(displayUnitWithPrefixes(amount: waterAmount)) \(displayUnitType()) of \(displayUnitWithPrefixes(amount: goalAmount)) \(displayUnitType())").foregroundStyle(.blue).font(.title2).fontWeight(.light)
     }
     
-    var decimalDisclaimerText: some View {
-        Text("After switching to a new unit (oz, L, mL) - values may have extended decimals. Decimals will reset on the next day.").foregroundStyle(.blue).font(.caption).opacity(0.5).padding(.top, 3)
-    }
-    
     func setAllDataOnAppear() {
-        //widgetWaterAmount = waterAmount
-        //water amount is solely based on change, so not necessary here.
-        
-        widgetGoalAmount = goalAmount
-        //goal doesn't change on appear, in changes during use, so ok to use here.
-        
-        UserDefaults(suiteName: "group.HydroHabit")?.set(widgetGoalAmount, forKey: "widgetGoalAmount")
-        
-        UserDefaults(suiteName: "group.HydroHabit")?.synchronize()
-        WidgetCenter.shared.reloadTimelines(ofKind: "HydroHabit")
-        WidgetCenter.shared.reloadAllTimelines()
-        
-        widgetSelectedUnit = selectedUnitType
-        
-        UserDefaults(suiteName: "group.HydroHabit")?.set(widgetSelectedUnit, forKey: "widgetSelectedUnit")
-        
-        UserDefaults(suiteName: "group.HydroHabit")?.synchronize()
-        WidgetCenter.shared.reloadTimelines(ofKind: "HydroHabit")
-        WidgetCenter.shared.reloadAllTimelines()
-        
-        widgetGoalPercentage = goalPercent
-        
-        UserDefaults(suiteName: "group.HydroHabit")?.set(widgetGoalPercentage, forKey: "widgetGoalPercentage")
-        
-        UserDefaults(suiteName: "group.HydroHabit")?.synchronize()
-        WidgetCenter.shared.reloadTimelines(ofKind: "HydroHabit")
-        WidgetCenter.shared.reloadAllTimelines()
-        
-        
-        widgetWaterAmount = waterAmount
-        
-        UserDefaults(suiteName: "group.HydroHabit")?.set(widgetWaterAmount, forKey: "widgetWaterAmount")
-        
-        UserDefaults(suiteName: "group.HydroHabit")?.synchronize()
-        WidgetCenter.shared.reloadTimelines(ofKind: "HydroHabit")
-        WidgetCenter.shared.reloadAllTimelines()
+        saveAllWidgetData()
     }
     
     func logCustomAmount() {
@@ -474,17 +430,10 @@ struct ContentView: View {
         
         waterAmount += customAmount
         
-        saveWaterAmountToWidget()
+        saveAllWidgetData()
         
         recentIsSaved = true
         recentWaterAmountSaved = Double(customAmount)
-    }
-    
-    func saveWaterAmountToWidget() {
-        UserDefaults(suiteName: "group.HydroHabit")?.set(widgetWaterAmount, forKey: "widgetWaterAmount")
-        UserDefaults(suiteName: "group.HydroHabit")?.synchronize()
-        WidgetCenter.shared.reloadTimelines(ofKind: "HydroHabit")
-        WidgetCenter.shared.reloadAllTimelines()
     }
     
     var quickAddButtonsView: some View {
@@ -496,7 +445,7 @@ struct ContentView: View {
                 waterLogCount += 1
                 entry1Saved = true
                 waterAmount += Double(quickAddValue1) ?? 0
-                saveWaterAmountToWidget()
+                saveAllWidgetData()
                 
                 recentIsSaved = true
                 recentWaterAmountSaved = Double(quickAddValue1) ?? 0
@@ -505,7 +454,7 @@ struct ContentView: View {
                 
                 ZStack {
                     
-                    Circle().stroke(lineWidth: 1).frame(width: 85, height: 85).foregroundStyle(.blue)
+                    Circle().stroke(lineWidth: 1).frame(width: 85, height: 85).foregroundStyle(.blue).shadow(color: .cyan.opacity(0.6), radius: 8, x: 2, y: 4)
                     
                     VStack {
                         
@@ -517,13 +466,14 @@ struct ContentView: View {
             }
             .disabled(disableAllButtons)
             
+            
             Button {
                 
                 buttonPressed.toggle()
                 waterLogCount += 1
                 entry2Saved = true
                 waterAmount += Double(quickAddValue2) ?? 0
-                saveWaterAmountToWidget()
+                saveAllWidgetData()
                 
                 recentIsSaved = true
                 recentWaterAmountSaved = Double(quickAddValue2) ?? 0
@@ -532,7 +482,7 @@ struct ContentView: View {
                 
                 ZStack {
                     
-                    Circle().stroke(lineWidth: 1).frame(width: 85, height: 85).foregroundStyle(.blue)
+                    Circle().stroke(lineWidth: 1).frame(width: 85, height: 85).foregroundStyle(.blue).shadow(color: .cyan.opacity(0.6), radius: 8, x: 2, y: 4)
                     
                     VStack {
                         Image(systemName: entry2Saved ? "checkmark" : "plus").padding(.bottom, 2).foregroundStyle(entry1Saved || entry3Saved || customAmountSaved ? .gray : .cyan)
@@ -550,7 +500,7 @@ struct ContentView: View {
                 entry3Saved = true
                 waterAmount += Double(quickAddValue3) ?? 0
                 
-                saveWaterAmountToWidget()
+                saveAllWidgetData()
                 
                 recentIsSaved = true
                 recentWaterAmountSaved = Double(quickAddValue3) ?? 0
@@ -559,7 +509,7 @@ struct ContentView: View {
                 
                 ZStack {
                     
-                    Circle().stroke(lineWidth: 1).frame(width: 85, height: 85).foregroundStyle(.blue)
+                    Circle().stroke(lineWidth: 1).frame(width: 85, height: 85).foregroundStyle(.blue).shadow(color: .cyan.opacity(0.6), radius: 8, x: 2, y: 4)
                     
                     VStack{
                         Image(systemName: entry3Saved ? "checkmark" : "plus").padding(.bottom, 2).foregroundStyle(entry1Saved || entry2Saved || customAmountSaved ? .gray : .cyan)
@@ -578,12 +528,18 @@ struct ContentView: View {
             
           logCustomAmount()
             
-        }.buttonStyle(.borderedProminent).tint(Color(red: 0/255, green: 0/255, blue: 50/255)).foregroundStyle(.cyan).opacity(0.7).frame(width: 100)
-            .onChange(of: waterLogCount) { _, newValue in
-                if newValue == 25 {
+            
+        }.padding(.horizontal, 24)
+            .padding(.vertical, 12)
+            .background(Color.cyan)
+            .foregroundStyle(.black)
+            .cornerRadius(14)
+            .shadow(color: .cyan.opacity(0.3), radius: 8, x: 3, y: 4)
+        .onChange(of: waterLogCount) { _, newValue in
+                if newValue == 1 || newValue == 5 || newValue == 10  {
                     requestReview()
                 }
-            }
+        }
     }
     
     var customAmountSliders: some View {
@@ -647,27 +603,6 @@ struct ContentView: View {
         }.frame(width:75)
     }
     
-    func saveWidgetGoalPercentage() {
-        UserDefaults(suiteName: "group.HydroHabit")?.set(widgetGoalPercentage, forKey: "widgetGoalPercentage")
-        UserDefaults(suiteName: "group.HydroHabit")?.synchronize()
-        WidgetCenter.shared.reloadTimelines(ofKind: "HydroHabit")
-        WidgetCenter.shared.reloadAllTimelines()
-    }
-    
-    func saveWidgetSelectedUnit() {
-        UserDefaults(suiteName: "group.HydroHabit")?.set(widgetSelectedUnit, forKey: "widgetSelectedUnit")
-        UserDefaults(suiteName: "group.HydroHabit")?.synchronize()
-        WidgetCenter.shared.reloadTimelines(ofKind: "HydroHabit")
-        WidgetCenter.shared.reloadAllTimelines()
-    }
-    
-    func saveWidgetGoalAmount() {
-        UserDefaults(suiteName: "group.HydroHabit")?.set(widgetGoalAmount, forKey: "widgetGoalAmount")
-        UserDefaults(suiteName: "group.HydroHabit")?.synchronize()
-        WidgetCenter.shared.reloadTimelines(ofKind: "HydroHabit")
-        WidgetCenter.shared.reloadAllTimelines()
-    }
-    
     //12:01am log entry, saved day is -1, i close app, i reopen, saved day is still -1, so saved day isn't equal to current day, so resets.
     //bug: if you haven't logged in a day, first entry resets to zero.
     //11:59pm open, but its reset to zero.
@@ -701,7 +636,7 @@ struct ContentView: View {
             
             waterAmount = 0.0
             
-            saveWaterAmountToWidget()
+            saveAllWidgetData()
             
             savedDay = currentDay
             
@@ -742,6 +677,8 @@ struct ContentView: View {
             self.goalAmount = goalAmount / 29.5735
        
         }
+        
+        
     }
     
     func animateButtonsAndProgressCircle() {
@@ -759,7 +696,7 @@ struct ContentView: View {
         }
 
             
-        if widgetGoalPercentage >= 100 && !goalScaleAnimationHasBeenShown  && !isAnimating {
+        if goalPercent >= 100 && !goalScaleAnimationHasBeenShown  && !isAnimating {
             isAnimating = true
             DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                 setNewOpacity = true
@@ -812,6 +749,28 @@ struct ContentView: View {
         } else if selectedUnitType == "mL" {
             customAmount = 50
         }
+    }
+    
+    func checkForReviewTrigger() {
+        if waterLogCount == 3 ||
+           waterLogCount == 10 ||
+           waterLogCount == 20 {
+
+            requestReview()
+        }
+    }
+    
+    func saveAllWidgetData() {
+        guard let defaults = UserDefaults(suiteName: "group.HydroHabit") else { return }
+        
+        defaults.set(waterAmount, forKey: "widgetWaterAmount")
+        defaults.set(goalAmount, forKey: "widgetGoalAmount")
+        defaults.set(goalPercent, forKey: "widgetGoalPercentage")
+        defaults.set(selectedUnitType, forKey: "widgetSelectedUnit")
+        
+        DispatchQueue.global(qos: .background).async {
+                WidgetCenter.shared.reloadTimelines(ofKind: "HydroHabit")
+            }
     }
 
 }
