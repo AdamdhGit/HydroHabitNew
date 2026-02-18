@@ -25,6 +25,8 @@ struct FirstLaunchView: View {
     
     @State private var selectedTab: Int = 0
     
+    @FocusState private var customGoalTextFocused: Bool
+    
     var body: some View {
         
         ZStack {
@@ -38,83 +40,118 @@ struct FirstLaunchView: View {
                 ZStack{
                   
                     VStack{
-                        
+                        Spacer()
                         hydroHabitIntroText
                         
-                        Image("waterDrop")
+                        Image("waterCups")
                             .resizable()
                             .frame(width: 300, height: 300)
                            
-                        
-                        Button("Next"){
+                        Spacer()
+                        Button("Get Started"){
                             selectedTab = 1
-                        }
+                        }.buttonStyle(.borderedProminent).tint(Color(red: 59/255, green: 89/255, blue: 152/255))
+                            .padding(.bottom, 200)
                     }
                     
                 }.tag(0).contentShape(Rectangle())
                     .gesture(DragGesture())
                 
                 ZStack{
-                  
                     VStack{
-                        Button{
-                            selectedTab = 0
-                        }label:{
-                            Image(systemName: "chevron.left")
-                        }
-                        Text("Pick your gender")
-                        genderPicker
+                        HStack{
+                            Button{
+                                selectedTab = 0
+                            }label:{
+                                Image(systemName: "chevron.left")
+                                    .controlSize(.extraLarge)
+                            }.tint(.white.opacity(0.5))
+                            Spacer()
+                        }.padding(.leading)
+                        Spacer()
+                    }
+                    
+                    VStack{
+                      
+                        Text("Pick your gender").padding(.top, 30)
+                        genderPicker.padding()
+                        Spacer()
                         Button("Next"){
                             selectedTab = 2
-                        }
-                    }
+                        }.buttonStyle(.borderedProminent).tint(Color(red: 59/255, green: 89/255, blue: 152/255))
+                            .padding(.bottom, 200)
+                    }.padding(.top, 70)
                 }.tag(1).contentShape(Rectangle())
                     .gesture(DragGesture())
                 
                 ZStack{
+                    
+                    VStack{
+                        HStack{
+                            Button{
+                                selectedTab = 1
+                            }label:{
+                                Image(systemName: "chevron.left")
+                                    .controlSize(.extraLarge)
+                            }.tint(.white.opacity(0.5))
+                            Spacer()
+                        }.padding(.leading)
+                        Spacer()
+                    }
                    
                     
                     VStack{
-                        Button{
-                            selectedTab = 1
-                        }label:{
-                            Image(systemName: "chevron.left")
-                        }
                         
-                        howWouldYouLikeToMeasureText
                         
-                        unitTypePicker
-                        
+                        howWouldYouLikeToMeasureText.padding(.horizontal)
+                        unitTypePicker.padding(.horizontal)
+                        Spacer()
                         Button("Next"){
                             selectedTab = 3
-                        }
-                    }
+                        }.buttonStyle(.borderedProminent).tint(Color(red: 59/255, green: 89/255, blue: 152/255))
+                            .padding(.bottom, 200)
+                    }.padding(.top, 70)
+
                 }.tag(2).contentShape(Rectangle())
                     .gesture(DragGesture())
                 
                 ZStack{
                  
+                    VStack{
+                        HStack{
+                            Button{
+                                selectedTab = 2
+                            }label:{
+                                Image(systemName: "chevron.left")
+                                    .controlSize(.extraLarge)
+                            }.tint(.white.opacity(0.5))
+                            Spacer()
+                        }.padding(.leading)
+                        Spacer()
+                    }
                     
                     VStack{
                         
-                        Button{
-                            selectedTab = 2
-                        }label:{
-                            Image(systemName: "chevron.left")
-                        }
                         
                         selectIntakeGoalText
                         
-                        intakeGoalPicker
+                        intakeDisclaimerText.padding(.horizontal).padding(.bottom, 20).padding(.top, 10)
+                        
+                        intakeGoalPicker.padding(.horizontal)
                         
                         customGoalEntryView
+                       
                         
-                        intakeDisclaimerText
+                            
                         
+                        Spacer()
                         Button("Next"){
                             selectedTab = 4
-                        }
-                    }
+                        }.buttonStyle(.borderedProminent).tint(Color(red: 59/255, green: 89/255, blue: 152/255))
+                            .padding(.bottom, 200)
+                            .disabled(dailyGoal == "Custom Goal" && customGoalAmount.isEmpty)
+                    }.padding(.top, 70)
+
                 }.tag(3).contentShape(Rectangle())
                     .gesture(DragGesture())
 
@@ -122,15 +159,26 @@ struct FirstLaunchView: View {
                 ZStack{
                    
                     VStack{
-                        
-                        Button{
-                            selectedTab = 3
-                        }label:{
-                            Image(systemName: "chevron.left")
-                        }
-                        startHydratingButton
-                        
+                        HStack{
+                            Button{
+                                selectedTab = 3
+                            }label:{
+                                Image(systemName: "chevron.left") .controlSize(.extraLarge)
+                                
+                            }.tint(.white.opacity(0.5))
+                            Spacer()
+                        }.padding(.leading)
+                        Spacer()
                     }
+                    VStack{
+                        
+                       
+                        Spacer()
+                        startHydratingButton.buttonStyle(.borderedProminent).tint(Color(red: 59/255, green: 89/255, blue: 152/255))
+                            .padding(.bottom, 200)
+                        
+                    }.padding(.top, 70)
+
                 }.tag(4).contentShape(Rectangle())
                     .gesture(DragGesture())
                     
@@ -153,7 +201,7 @@ struct FirstLaunchView: View {
     }
     
     var howWouldYouLikeToMeasureText: some View {
-        Text("How would you like to measure your water intake?").padding(.top, 30).foregroundStyle(.white)
+        Text("How would you like to measure your water intake?").padding(.top, 30).foregroundStyle(.white).multilineTextAlignment(.center)
     }
     
     var genderPicker: some View {
@@ -216,27 +264,34 @@ struct FirstLaunchView: View {
                 
                 VStack {
                     
-                    Text("Enter Your Daily Intake Goal in \(selectedUnitType)").foregroundStyle(.white)
-                    
-                    ZStack {
+                    Text("Enter Your Daily Intake Goal in \(selectedUnitType)").foregroundStyle(.white).padding(.top, 15).font(.callout)
+     
+                       
                         
-                        RoundedRectangle(cornerRadius: 10).stroke(lineWidth: 2).foregroundStyle(.cyan)
-                        
-                        TextField("Custom Goal Amount in \(selectedUnitType)", text: $customGoalAmount).keyboardType(selectedUnitType == "L" ? .decimalPad : .numberPad).padding().onChange(of: customGoalAmount) { _, newValue in
+                        TextField("Custom Goal Amount in \(selectedUnitType)", text: $customGoalAmount)
+                            .focused($customGoalTextFocused)
+                            .keyboardType(selectedUnitType == "L" ? .decimalPad : .numberPad).padding().onChange(of: customGoalAmount) { _, newValue in
                             if newValue.count > 5 {
                                 customGoalAmount = String(newValue.prefix(5))
                             }
+                        }.background{
+                            RoundedRectangle(cornerRadius: 10).fill(Color.gray.opacity(0.25)).frame(height: 40)
                         }
+                        .frame(width: 300)
+                        .onAppear {
+                            customGoalTextFocused.toggle()
+                        }
+                        .submitLabel(.done)
                         
-                    }.frame(height: 60)
                     
                 }
             }
         }
-        .transition(.slide)
+        //.transition(.slide)
         .onChange(of: dailyGoal) { oldValue, newValue in
             if newValue == "Custom Goal" {
-                withAnimation{
+                
+                withAnimation {
                     customGoalSelected = true
                 }
             } else {
@@ -264,7 +319,7 @@ struct FirstLaunchView: View {
     }
     
     var intakeDisclaimerText: some View {
-        Text("General intake estimates based on 'National Academies of Sciences, Engineering, and Medicine. Dietary Reference Intakes for Water, Potassium, Sodium, Chloride, and Sulfate (2005)' - for more specific recommendations, consult your doctor.").foregroundStyle(.white).opacity(0.5).font(.caption).padding(.top, 20)
+        Text("General intake estimates based on 'National Academies of Sciences, Engineering, and Medicine. Dietary Reference Intakes for Water, Potassium, Sodium, Chloride, and Sulfate (2005)' - for more specific recommendations, consult your doctor.").foregroundStyle(.white).opacity(0.5).font(.caption).multilineTextAlignment(.center)
     }
     
     var backgroundColor: LinearGradient {
@@ -283,7 +338,7 @@ struct FirstLaunchView: View {
         Button("Start Hydrating"){
            saveGoalAmount()
            setupFinished = true
-        }.buttonStyle(.borderedProminent).tint(.black).padding(.top, 15).disabled(dailyGoal == "Custom Goal" && customGoalAmount.isEmpty ? true : false)
+        }.disabled(dailyGoal == "Custom Goal" && customGoalAmount.isEmpty ? true : false)
     }
 }
 
