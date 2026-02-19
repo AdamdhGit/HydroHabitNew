@@ -138,7 +138,7 @@ struct ContentView: View {
                                 .onChange(of: buttonPressed) { _,_ in
                                     disableAllButtons = true
                                     animateButtonsAndProgressCircle()
-                                   
+                                    
                                     
                                 }
                                 .onAppear{
@@ -170,99 +170,138 @@ struct ContentView: View {
                         }.padding(.top, 60).padding(.bottom, 20)
                             .scaleEffect(enlargeProgress ? 1.2 : 1)
                             .offset(y:-20)
-
+                        
                         //Text("Well Done.").foregroundStyle(.cyan).fontWeight(.light).font(.title3).padding(.top, -15)
                         
                         HStack {
                             
-                            quickAddText
+                            //quickAddText
                             
                             Spacer()
                             
                             if recentIsSaved {
                                 
-                              undoRecentButton
+                                undoRecentButton
                                 
                             }
                             
                         }.padding(.top, 5)
                         
-                        quickAddButtonsView
+                        
+                        
+                        /*
+                         HStack {
+                         
+                         //customAmountText
+                         
+                         Spacer()
+                         
+                         }.padding(.top, 20)
+                         */
+                        VStack{
+                            quickAddButtonsView
+                            
+                            
+                            
+                            HStack {
+                                
+                                
+                                customAmountSliders.tint(.blue)
+                                
+                                Spacer()
+                                
+                                slidersDisplayedValues
+                                
+                                logButton
+                                
+                                Spacer()
+                                
+                            }
+                        }.padding().background{
+                            RoundedRectangle(cornerRadius: 16).foregroundStyle(.gray).opacity(0.1)
+                        }
                         
                         HStack {
                             
-                            customAmountText
+                            progressTodayText.font(.title3)
                             
                             Spacer()
                             
-                        }.padding(.top, 20)
-                        
-                        HStack {
-                            
-                           
-                            
-                            customAmountSliders.tint(.cyan)
-                            
-                            Spacer()
-                            
-                           slidersDisplayedValues
-                            
-                           logButton
-                            
-                            Spacer()
+                            editGoalButton
                             
                         }.padding(.top, 10)
                         
-                        Divider().padding(.top, 20)
-                        
-                        HStack {
+                        VStack{
+                            HStack {
+                                
+                                Text("\(formattedGoalPercent)%")
+                                
+                                Spacer()
+                                
+                            }.foregroundStyle(.blue).font(.title).padding(.top, -2)
                             
-                            progressTodayText
-                            
-                            Spacer()
-                            
-                           editGoalButton
-                            
-                        }.padding(.top, 10).font(.title2)
-                        
-                        HStack {
-                            
-                            Text("\(formattedGoalPercent)%")
-                            
-                            Spacer()
-                            
-                        }.foregroundStyle(.blue).font(.title).padding(.top, -2)
-                        
-                        HStack {
-                            
-                            waterAmountOfGoalText
-
-                            Spacer()
-                            
-                        }.padding(.top, -7)
-                        
+                            HStack {
+                                
+                                waterAmountOfGoalText
+                                
+                                Spacer()
+                                
+                            }.padding(.top, -7)
+                        }.padding().background{
+                            RoundedRectangle(cornerRadius: 16).foregroundStyle(.gray).opacity(0.1)
+                        }
                         Spacer()
                         
-                    }.preferredColorScheme(.dark)
-                        .onChange(of: selectedUnitType) { oldValue, newValue in
-                      
-                                setDefaultCustomAmountOnUnitChange()
-                                updateAmountsAfterUnitConversion(oldValue: oldValue, newValue: newValue)
-                                
-                                recentIsSaved = false
-                                
-                                
-                            
-                            saveAllWidgetData()
-                        }
-                    //
-                       
-                        .sheet(isPresented: $editGoalSheetShowing, content: {
-                            ChangeGoalView(selectedUnitType: $selectedUnitType, goalAmount: $goalAmount)
-                        })
+                    }
+                    
+                    .onChange(of: selectedUnitType) { oldValue, newValue in
                         
-                }
-                .padding()
+                        setDefaultCustomAmountOnUnitChange()
+                        updateAmountsAfterUnitConversion(oldValue: oldValue, newValue: newValue)
+                        
+                        recentIsSaved = false
+                        
+                        
+                        
+                        saveAllWidgetData()
+                    }
+                    //
+                    
+                    .sheet(isPresented: $editGoalSheetShowing, content: {
+                        ChangeGoalView(selectedUnitType: $selectedUnitType, goalAmount: $goalAmount)
+                    })
+                    
+                }.padding(.horizontal)
+                
+                VStack{
+                    Spacer()
+                    HStack{
+                        Spacer()
+                        Button {
+                            // action
+                        } label: {
+                            Image(systemName: entry3Saved ? "checkmark" : "plus")
+                                .font(.system(size: 24, weight: .bold))
+                                .foregroundColor(.white)
+                                .frame(width: 50, height: 50)
+                                .contentShape(Circle())
+                        }
+                        .background(
+                            Group {
+                                if #available(iOS 26.0, *) {
+                                    Circle()
+                                        .glassEffect()
+                                } else {
+                                    Circle()
+                                        .background(.ultraThinMaterial)
+                                }
+                            }
+                        )
+                        .buttonStyle(.plain)
+                    }
+                    
+                }.padding(.trailing, 30).padding(.bottom)
+                //button vstack end
                 
             }
         }
@@ -319,7 +358,7 @@ struct ContentView: View {
     }
     
     var hydroHabitTitleText: some View {
-        Text("HydroHabit").foregroundStyle(.cyan).font(.title2).opacity(0.9)
+        Text("HydroHabit").foregroundStyle(.white).font(.title2).bold()
     }
     
     var changeWaterUnitPicker: some View {
@@ -347,7 +386,7 @@ struct ContentView: View {
             .background(Color.white.opacity(0.001)) // Increases tap area without visual change
             .frame(width: 60, alignment: .trailing) // THE FIX: Absolute width
         }
-        .tint(.cyan)
+        .tint(.blue)
         // This prevents the "Drawing" animation from stuttering
         .transaction { transaction in
             transaction.animation = nil
@@ -379,6 +418,7 @@ struct ContentView: View {
             Text("Undo Recent")
             
         }.font(.footnote).foregroundStyle(.white)
+            .padding(.trailing)
         
     }
     
@@ -453,16 +493,22 @@ struct ContentView: View {
             } label: {
                 
                 ZStack {
-                    
-                    Circle().stroke(lineWidth: 1).frame(width: 85, height: 85).foregroundStyle(.blue).shadow(color: .cyan.opacity(0.6), radius: 8, x: 2, y: 4)
-                    
-                    VStack {
-                        
-                        Image(systemName: entry1Saved ? "checkmark" : "plus").padding(.bottom, 2).foregroundStyle(entry2Saved || entry3Saved || customAmountSaved ? .gray : .cyan)
-                        Text("\(quickAddValue1)\(displayUnitType())")
-                        
-                    }
-                }
+                      // Base circle with gradient fill for depth
+                    Circle().fill(Color.blue.opacity(0.4))
+                           .frame(width: 60, height: 60)
+
+                      VStack {
+                          Image(systemName: entry1Saved ? "checkmark" : "plus")
+                              .font(.system(size: 24, weight: .bold))
+                              .foregroundStyle(
+                                  entry2Saved || entry3Saved || customAmountSaved ? .gray : .white
+                              )
+                              .padding(.bottom, 5)
+                          Text("\(quickAddValue1)\(displayUnitType())")
+                              .font(.caption2.bold())
+                              .foregroundColor(.white)
+                      }
+                  }
             }
             .disabled(disableAllButtons)
             
@@ -481,13 +527,21 @@ struct ContentView: View {
             } label: {
                 
                 ZStack {
-                    
-                    Circle().stroke(lineWidth: 1).frame(width: 85, height: 85).foregroundStyle(.blue).shadow(color: .cyan.opacity(0.6), radius: 8, x: 2, y: 4)
-                    
+                    // Base circle with gradient fill for depth
+                    Circle().fill(Color.blue.opacity(0.4))
+                           .frame(width: 60, height: 60)
+
                     VStack {
-                        Image(systemName: entry2Saved ? "checkmark" : "plus").padding(.bottom, 2).foregroundStyle(entry1Saved || entry3Saved || customAmountSaved ? .gray : .cyan)
+                        Image(systemName: entry2Saved ? "checkmark" : "plus")
+                            .font(.system(size: 24, weight: .bold))
+                            .foregroundStyle(
+                                entry1Saved || entry3Saved || customAmountSaved ? .gray : .white
+                            )
+                          
+                            .padding(.bottom, 5)
                         Text("\(quickAddValue2)\(displayUnitType())")
-                        
+                            .font(.caption2.bold())
+                            .foregroundColor(.white)
                     }
                 }
             }
@@ -508,35 +562,54 @@ struct ContentView: View {
             } label: {
                 
                 ZStack {
-                    
-                    Circle().stroke(lineWidth: 1).frame(width: 85, height: 85).foregroundStyle(.blue).shadow(color: .cyan.opacity(0.6), radius: 8, x: 2, y: 4)
-                    
-                    VStack{
-                        Image(systemName: entry3Saved ? "checkmark" : "plus").padding(.bottom, 2).foregroundStyle(entry1Saved || entry2Saved || customAmountSaved ? .gray : .cyan)
+                    // Base circle with gradient fill for depth
+                    Circle().fill(Color.blue.opacity(0.4))
+                           .frame(width: 60, height: 60)
+
+                    VStack {
+                        Image(systemName: entry3Saved ? "checkmark" : "plus")
+                            .font(.system(size: 24, weight: .bold))
+                            .foregroundStyle(
+                                entry1Saved || entry2Saved || customAmountSaved ? .gray : .white
+                            )
+                           
+                            .padding(.bottom, 5)
                         Text("\(quickAddValue3)\(displayUnitType())")
-                        
+                            .font(.caption2.bold())
+                            .foregroundColor(.white)
                     }
                 }
             }
             .disabled(disableAllButtons)
             
-        }.padding(.top, 20)
+        }
     }
     
     var logButton: some View {
-        Button("Log"){
+        Button{
             
           logCustomAmount()
             
             
-        }.padding(.horizontal, 24)
-            .padding(.vertical, 12)
-            .background(Color.cyan)
-            .foregroundStyle(.black)
-            .cornerRadius(14)
-            .shadow(color: .cyan.opacity(0.3), radius: 8, x: 3, y: 4)
+        }label:{
+            
+            Image(systemName: entry3Saved ? "checkmark" : "plus")
+                .font(.system(size: 24, weight: .bold))
+                .foregroundStyle(
+                    entry1Saved || entry2Saved || entry3Saved ? .gray : .white
+                )
+                .foregroundStyle(.white)
+                .frame(width: 50, height: 50)
+                .background(
+                            Circle()
+                                .fill(Color.blue)
+                        )
+                        .contentShape(Circle())            // makes the tap area circular
+            
+        }
+        .buttonStyle(.plain)
         .onChange(of: waterLogCount) { _, newValue in
-                if newValue == 1 || newValue == 5 || newValue == 10  {
+                if newValue == 3 || newValue == 30 || newValue == 100  {
                     requestReview()
                 }
         }
@@ -570,18 +643,29 @@ struct ContentView: View {
         VStack{
             ZStack {
                 
-                Circle().stroke(lineWidth: enlargeProgress ? 10 : 4).foregroundStyle(.gray).frame(width: 140, height: 140).opacity(0.5)
+                Circle()
+                    .stroke(lineWidth: enlargeProgress ? 10 : 4)
+                    .foregroundStyle(.gray)
+                    .frame(width: 140, height: 140)
+                    .opacity(0.5)
                 
-                Circle().trim(from: 0.0, to: animatedProgress).stroke(lineWidth: enlargeProgress ? 10 : 4).foregroundStyle(.cyan).frame(width: 140, height: 140).shadow(color: .cyan, radius: 10, x: 0, y: 0).rotationEffect(.degrees(-90))
+                Circle().trim(from: 0.0, to: animatedProgress).stroke(lineWidth: enlargeProgress ? 10 : 4).foregroundStyle(.blue).frame(width: 140, height: 140).shadow(color: .blue, radius: 10, x: 0, y: 0).rotationEffect(.degrees(-90))
                     .overlay(
-                        Circle().stroke(lineWidth: 4).foregroundStyle(.cyan).frame(width: scaleForCompletion && !goalScaleAnimationHasBeenShown ? 3000 : 140, height: scaleForCompletion && !goalScaleAnimationHasBeenShown ? 3000 : 140).shadow(color: .blue, radius: 10, x: 0, y: 0).rotationEffect(.degrees(-90)).scaleEffect(scaleForCompletion && !goalScaleAnimationHasBeenShown ? 30 : 1).opacity(setNewOpacity ? 0.4 : 0).ignoresSafeArea(.all)
-            )
-                }
+                        Circle()
+                            .stroke(lineWidth: 4)
+                            .foregroundStyle(.blue).frame(width: scaleForCompletion && !goalScaleAnimationHasBeenShown ? 3000 : 140, height: scaleForCompletion && !goalScaleAnimationHasBeenShown ? 3000 : 140)
+                            .shadow(color: .blue, radius: 10, x: 0, y: 0)
+                            .rotationEffect(.degrees(-90))
+                            .scaleEffect(scaleForCompletion && !goalScaleAnimationHasBeenShown ? 30 : 1)
+                            .opacity(setNewOpacity ? 0.4 : 0)
+                            .ignoresSafeArea(.all)
+                    )
+            }
         }
     }
     
     var progressWaterDroplet: some View {
-        Image(systemName: "drop").foregroundStyle(.cyan).font(.title).padding(.bottom, 10).bold().shadow(color: .cyan, radius: 10, x: 0, y: 0)
+        Image(systemName: "drop").foregroundStyle(.blue).font(.title).padding(.bottom, 10).bold().shadow(color: .blue, radius: 10, x: 0, y: 0)
     }
     
     var slidersDisplayedValues: some View {
