@@ -5,10 +5,13 @@
 //  Created by Adam Heidmann on 1/11/25.
 //
 
+import CoreData
 import SwiftUI
 
 @main
 struct HydroHabit2App: App {
+    
+    var dataController = DataController()
     
     @AppStorage("setupFinished") var setupFinished = false
     //gets assigned after launch setup is finished, then immediately saves to private var inside content view.
@@ -18,7 +21,7 @@ struct HydroHabit2App: App {
     var body: some Scene {
         WindowGroup {
             if setupFinished {
-                ContentView(goalAmount: $goalAmount, selectedUnitType: $selectedUnitType).preferredColorScheme(.dark)
+                ContentView(goalAmount: $goalAmount, selectedUnitType: $selectedUnitType).preferredColorScheme(.dark).environment(\.managedObjectContext, dataController.container.viewContext)
             } else {
                 FirstLaunchView(setupFinished: $setupFinished, selectedUnitType: $selectedUnitType, goalAmount: $goalAmount)
             }

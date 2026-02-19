@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		66EF398D2F478801003C9392 /* HydroHabit2App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66EF39862F478801003C9392 /* HydroHabit2App.swift */; };
+		66EF39C52F478B8C003C9392 /* HydroHabit.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 66EF39C32F478B8C003C9392 /* HydroHabit.xcdatamodeld */; };
+		66EF39C72F478BBB003C9392 /* DataController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66EF39C62F478BBB003C9392 /* DataController.swift */; };
 		BAB70C5C2D32E812005FF767 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BAB70C5B2D32E812005FF767 /* WidgetKit.framework */; };
 		BAB70C5E2D32E812005FF767 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BAB70C5D2D32E812005FF767 /* SwiftUI.framework */; };
 		BAB70C692D32E813005FF767 /* HydroHabitWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = BAB70C592D32E812005FF767 /* HydroHabitWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -51,6 +54,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		66EF39862F478801003C9392 /* HydroHabit2App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HydroHabit2App.swift; sourceTree = "<group>"; };
+		66EF39C42F478B8C003C9392 /* HydroHabit.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = HydroHabit.xcdatamodel; sourceTree = "<group>"; };
+		66EF39C62F478BBB003C9392 /* DataController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataController.swift; sourceTree = "<group>"; };
 		BAB70C282D32E7FD005FF767 /* HydroHabit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HydroHabit.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BAB70C382D32E7FF005FF767 /* HydroHabit2Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HydroHabit2Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		BAB70C422D32E7FF005FF767 /* HydroHabit2UITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HydroHabit2UITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -144,6 +150,9 @@
 		BAB70C1F2D32E7FD005FF767 = {
 			isa = PBXGroup;
 			children = (
+				66EF39862F478801003C9392 /* HydroHabit2App.swift */,
+				66EF39C32F478B8C003C9392 /* HydroHabit.xcdatamodeld */,
+				66EF39C62F478BBB003C9392 /* DataController.swift */,
 				BAB70C702D32E84A005FF767 /* HydroHabitWidgetExtension.entitlements */,
 				BAB70C2A2D32E7FD005FF767 /* HydroHabit2 */,
 				BAB70C3B2D32E7FF005FF767 /* HydroHabit2Tests */,
@@ -355,6 +364,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				66EF39C52F478B8C003C9392 /* HydroHabit.xcdatamodeld in Sources */,
+				66EF39C72F478BBB003C9392 /* DataController.swift in Sources */,
+				66EF398D2F478801003C9392 /* HydroHabit2App.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -754,6 +766,19 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		66EF39C32F478B8C003C9392 /* HydroHabit.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				66EF39C42F478B8C003C9392 /* HydroHabit.xcdatamodel */,
+			);
+			currentVersion = 66EF39C42F478B8C003C9392 /* HydroHabit.xcdatamodel */;
+			path = HydroHabit.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = BAB70C202D32E7FD005FF767 /* Project object */;
 }

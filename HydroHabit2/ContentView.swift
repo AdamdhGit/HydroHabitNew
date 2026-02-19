@@ -5,13 +5,23 @@
 //  Created by Adam Heidmann on 1/11/25.
 //
 
+import CoreData
 import StoreKit
 import SwiftUI
 import WidgetKit
 
-//test startup app downloaded as mL and L make sure keeps everything as setup.
-
 struct ContentView: View {
+    
+    @Environment(\.managedObjectContext) var moc
+    
+    @FetchRequest(
+        sortDescriptors: [
+            SortDescriptor(\WaterLog.dateSaved, order: .reverse)
+        ],
+        animation: .default
+    )
+    private var recentEntries: FetchedResults<WaterLog>
+
     
     @State var showWaterOptions = false
     
@@ -34,7 +44,6 @@ struct ContentView: View {
     @State var buttonPressed = false
     //used to animate progress circle after pressed
     
-    @State var recentIsSaved = false
     @State var recentWaterAmountSaved:Double = 0
     @Binding var goalAmount: Double
     @AppStorage("goalScaleAnimationHasBeenShown") var goalScaleAnimationHasBeenShown = false
@@ -125,7 +134,7 @@ struct ContentView: View {
                                         setAllDataOnAppear()
                                         animatedProgress = (waterAmount / goalAmount)
                                         
-                                        recentIsSaved = false
+                                       
                                         
                                     }
                                 }
@@ -138,18 +147,6 @@ struct ContentView: View {
                         }.padding(.top, 60).padding(.bottom, 20)
                             .scaleEffect(enlargeProgress ? 1.2 : 1)
                             .offset(y:-20)
-                        
-                        HStack {
-                            
-                            Spacer()
-                            
-                            if recentIsSaved {
-                                
-                                undoRecentButton
-                                
-                            }
-                            
-                        }.padding(.top, 5)
                         
                         
                         
@@ -169,9 +166,7 @@ struct ContentView: View {
                             progressTodayText.font(.title3)
                             
                             Spacer()
-                            
-                            editGoalButton
-                            
+                                                        
                         }.padding(.top, 10)
                         
                         VStack{
@@ -189,8 +184,79 @@ struct ContentView: View {
                                 
                                 Spacer()
                                 
+                                editGoalButton
+                                
                             }.padding(.top, -7)
                         }.padding().background{
+                            RoundedRectangle(cornerRadius: 16).foregroundStyle(.gray).opacity(0.1)
+                        }
+                        
+                        HStack {
+                            
+                            Text("Recent History").font(.title3)
+                            
+                            Spacer()
+                                                        
+                        }.padding(.top, 10)
+                        
+                        VStack{
+                           
+                            if recentEntries.isEmpty {
+                                HStack{
+                                    Text("No recent entries today.").foregroundStyle(.gray).opacity(0.5)
+                                    Spacer()
+                                }
+                            }else {
+                                
+                                let recentLogs = Array(recentEntries.prefix(5))
+                                
+                                VStack{
+                                    ForEach(recentLogs.indices, id: \.self) { index in
+                                        
+                                        let log = recentLogs[index]
+                                        //filter by index to base logic on count of index
+                                        
+                                        HStack{
+                                            Text("\(displayUnitWithPrefixes(amount: log.waterAmount)) \(displayUnitType())")
+                                                .frame(maxWidth: .infinity, alignment: .leading)
+                                            Text(log.dateSaved ?? Date(), format: .dateTime.hour().minute())
+                                                .frame(maxWidth: .infinity, alignment: .leading)
+                                            
+                                            Spacer()
+                                            
+                                            Button {
+                                                
+                                                //undo recent
+                                                waterAmount -= log.waterAmount
+                                                
+                                                saveAllWidgetData()
+                                                
+                                                withAnimation {
+                                                    animatedProgress = (waterAmount / goalAmount)
+                                                }
+                                                
+                                                moc.delete(log)
+                                                
+                                            } label: {
+                                                
+                                                Image(systemName: "arrow.clockwise")
+                                                    .font(.system(size: 16))
+                                                
+                                            }
+                                            .foregroundStyle(.gray)
+                                            .opacity(0.5)
+                                            
+                                        }
+                                     
+                                        if index < recentLogs.count - 1 {
+                                                   Rectangle()
+                                                       .fill(Color.gray.opacity(0.2))
+                                                       .frame(height: 1)
+                                               }
+                                    }
+                                }.foregroundStyle(.blue)
+                            }
+                        }.frame(maxWidth: .infinity).padding().background{
                             RoundedRectangle(cornerRadius: 16).foregroundStyle(.gray).opacity(0.1)
                         }
                         Spacer()
@@ -202,7 +268,16 @@ struct ContentView: View {
                         setDefaultCustomAmountOnUnitChange()
                         updateAmountsAfterUnitConversion(oldValue: oldValue, newValue: newValue)
                         
-                        recentIsSaved = false
+                        // Update all recent entries
+                          for log in recentEntries {
+                              updateRecentEntriesAfterUnitConversion(for: log, oldValue: oldValue, newValue: newValue)
+                          }
+
+                          // Save context
+                          try? moc.save()
+                        
+                        
+                       
                         
                         
                         
@@ -247,7 +322,7 @@ struct ContentView: View {
                 
             }
             .sheet(isPresented: $showWaterOptions) {
-                WaterOptionsView(selectedUnitType: $selectedUnitType, waterLogCount: $waterLogCount, buttonPressed: $buttonPressed, waterAmount: $waterAmount, customAmount: $customAmount, goalAmount: $goalAmount, recentIsSaved: $recentIsSaved, recentWaterAmountSaved: $recentWaterAmountSaved, customAmountSaved: $customAmountSaved)
+                WaterOptionsView(selectedUnitType: $selectedUnitType, waterLogCount: $waterLogCount, buttonPressed: $buttonPressed, waterAmount: $waterAmount, customAmount: $customAmount, goalAmount: $goalAmount, recentWaterAmountSaved: $recentWaterAmountSaved, customAmountSaved: $customAmountSaved)
                     .presentationDetents([.medium])
             }
         }
@@ -329,31 +404,7 @@ struct ContentView: View {
             transaction.animation = nil
         }
     }
-    
-    var undoRecentButton: some View {
-        Button {
-            
-            //undo recent
-            waterAmount -= recentWaterAmountSaved
-            
-            saveAllWidgetData()
-            
-            recentIsSaved = false
-            
-            withAnimation {
-                animatedProgress = (waterAmount / goalAmount)
-            }
-            
-        } label: {
-            
-            Image(systemName: "arrow.clockwise")
-            
-            Text("Undo Recent")
-            
-        }.font(.footnote).foregroundStyle(.white)
-            .padding(.trailing)
-        
-    }
+
     
     var customAmountText: some View {
         Text("Custom Amount").foregroundStyle(.white)
@@ -370,10 +421,11 @@ struct ContentView: View {
             
         } label: {
             
-            Image(systemName: "pencil")
-            Text("Edit Goal")
+            Image(systemName: "square.and.pencil")
+                .font(.system(size: 24, weight: .bold))
+                .contentShape(Rectangle())
             
-        }.font(.footnote).padding(.horizontal).foregroundStyle(.white)
+        }.font(.footnote).foregroundStyle(.gray.opacity(0.3))
         
     }
     
@@ -497,6 +549,36 @@ struct ContentView: View {
         
     }
     
+    func updateRecentEntriesAfterUnitConversion (for log: WaterLog, oldValue: String, newValue: String) {
+        if oldValue == "oz" && newValue == "L" {
+            
+            log.waterAmount = log.waterAmount * 0.0295735
+       
+        } else if oldValue == "oz" && newValue == "mL" {
+            
+            log.waterAmount = log.waterAmount * 29.5735
+            
+        } else if oldValue == "L" && newValue == "oz" {
+            
+            log.waterAmount = log.waterAmount * 33.814
+       
+        } else if oldValue == "L" && newValue == "mL" {
+            
+            log.waterAmount = log.waterAmount  * 1000
+            
+        } else if oldValue == "mL" && newValue == "L" {
+            
+            log.waterAmount = log.waterAmount / 1000
+            
+        } else if oldValue == "mL" && newValue == "oz" {
+            
+            log.waterAmount = log.waterAmount / 29.5735
+       
+        }
+        
+        
+    }
+    
     func animateButtonsAndProgressCircle() {
         
         
@@ -587,10 +669,6 @@ struct ContentView: View {
             }
     }
 
-}
-
-#Preview {
-    ContentView(goalAmount: .constant(130), selectedUnitType: .constant("oz"))
 }
 
 extension Double {

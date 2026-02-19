@@ -5,10 +5,13 @@
 //  Created by Adam Heidmann on 2/18/26.
 //
 
+import CoreData
 import SwiftUI
 import WidgetKit
 
 struct WaterOptionsView: View {
+    
+    @Environment(\.managedObjectContext) var moc
     
     @Environment(\.requestReview) var requestReview
     @Environment(\.dismiss) var dismiss
@@ -19,7 +22,6 @@ struct WaterOptionsView: View {
     @Binding var waterAmount: Double
     @Binding var customAmount: Double
     @Binding var goalAmount: Double
-    @Binding var recentIsSaved: Bool
     @Binding var recentWaterAmountSaved: Double
     @Binding var customAmountSaved: Bool
     
@@ -104,8 +106,14 @@ struct WaterOptionsView: View {
                         waterAmount += Double(quickAddValue1) ?? 0
                         saveAllWidgetData()
                         
-                        recentIsSaved = true
+                    
                         recentWaterAmountSaved = Double(quickAddValue1) ?? 0
+                        
+                        let newItem = WaterLog(context: moc)
+                        newItem.id = UUID()
+                        newItem.waterAmount = Double(quickAddValue1) ?? 0
+                        newItem.dateSaved = Date()
+                        try? moc.save()
                         
                         dismiss()
                     } label: {
@@ -138,8 +146,14 @@ struct WaterOptionsView: View {
                         waterAmount += Double(quickAddValue2) ?? 0
                         saveAllWidgetData()
                         
-                        recentIsSaved = true
+                  
                         recentWaterAmountSaved = Double(quickAddValue2) ?? 0
+                        
+                        let newItem = WaterLog(context: moc)
+                        newItem.id = UUID()
+                        newItem.waterAmount = Double(quickAddValue2) ?? 0
+                        newItem.dateSaved = Date()
+                        try? moc.save()
                         
                         dismiss()
                         
@@ -174,10 +188,18 @@ struct WaterOptionsView: View {
                         
                         saveAllWidgetData()
                         
-                        recentIsSaved = true
+                   
                         recentWaterAmountSaved = Double(quickAddValue3) ?? 0
                         
+                        let newItem = WaterLog(context: moc)
+                        newItem.id = UUID()
+                        newItem.waterAmount = Double(quickAddValue3) ?? 0
+                        newItem.dateSaved = Date()
+                        try? moc.save()
+                        
                         dismiss()
+                        
+                        
                         
                     } label: {
                         
@@ -308,8 +330,14 @@ struct WaterOptionsView: View {
         
         saveAllWidgetData()
         
-        recentIsSaved = true
+     
         recentWaterAmountSaved = Double(customAmount)
+        
+        let newItem = WaterLog(context: moc)
+        newItem.id = UUID()
+        newItem.waterAmount = Double(customAmount)
+        newItem.dateSaved = Date()
+        try? moc.save()
     }
     
     func displaySliderValues(amount: Double) -> String {
