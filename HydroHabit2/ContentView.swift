@@ -205,59 +205,71 @@ struct ContentView: View {
                                 HStack{
                                     Text("No recent entries today.").foregroundStyle(.gray).opacity(0.5)
                                     Spacer()
-                                }
+                                }.frame(maxWidth: .infinity)
+                                    .padding()
+                                    .background{
+                                        RoundedRectangle(cornerRadius: 16).foregroundStyle(.gray).opacity(0.1)
+                                    }
                             }else {
                                 
-                                let recentLogs = Array(recentEntries.prefix(5))
+                          
                                 
                                 VStack{
-                                    ForEach(recentLogs.indices, id: \.self) { index in
+                                  
+                                    
+                                    ForEach(recentEntries.prefix(5), id: \.self) { i in
                                         
-                                        let log = recentLogs[index]
-                                        //filter by index to base logic on count of index
-                                        
-                                        HStack{
-                                            Text("\(displayUnitWithPrefixes(amount: log.waterAmount)) \(displayUnitType())")
-                                                .frame(maxWidth: .infinity, alignment: .leading)
-                                            Text(log.dateSaved ?? Date(), format: .dateTime.hour().minute())
-                                                .frame(maxWidth: .infinity, alignment: .leading)
-                                            
-                                            Spacer()
-                                            
-                                            Button {
+                                      
+                                            HStack{
+                                                Text("\(displayUnitWithPrefixes(amount: i.waterAmount)) \(displayUnitType())")
+                                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                                Text(i.dateSaved ?? Date(), format: .dateTime.hour().minute())
+                                                    .frame(maxWidth: .infinity, alignment: .leading)
                                                 
-                                                //undo recent
-                                                waterAmount -= log.waterAmount
+                                                Spacer()
                                                 
-                                                saveAllWidgetData()
-                                                
-                                                withAnimation {
-                                                    animatedProgress = (waterAmount / goalAmount)
+                                                Button {
+                                                    
+                                                    
+                                                    //undo recent
+                                                    waterAmount -= i.waterAmount
+                                                    
+                                                    
+                                                    
+                                                    withAnimation {
+                                                        animatedProgress = (waterAmount / goalAmount)
+                                                    }
+                                           
+                                                            moc.delete(i)
+                                                            try? moc.save()
+                                                            saveAllWidgetData()
+                                                        
+                                                    
+                                                    
+                                                    
+                                                } label: {
+                                                    
+                                                    Image(systemName: "arrow.clockwise")
+                                                        .font(.system(size: 16))
+                                                    
                                                 }
-                                                
-                                                moc.delete(log)
-                                                
-                                            } label: {
-                                                
-                                                Image(systemName: "arrow.clockwise")
-                                                    .font(.system(size: 16))
+                                                .foregroundStyle(.gray)
+                                                .opacity(0.5)
                                                 
                                             }
-                                            .foregroundStyle(.gray)
-                                            .opacity(0.5)
+                                            .frame(maxWidth: .infinity)
+                                            .padding()
+                                            .background{
+                                                RoundedRectangle(cornerRadius: 16).foregroundStyle(.gray).opacity(0.1)
+                                            }
                                             
-                                        }
-                                     
-                                        if index < recentLogs.count - 1 {
-                                                   Rectangle()
-                                                       .fill(Color.gray.opacity(0.2))
-                                                       .frame(height: 1)
-                                               }
+                                        
+                                        
                                     }
                                 }.foregroundStyle(.blue)
+                                
+                                   
                             }
-                        }.frame(maxWidth: .infinity).padding().background{
-                            RoundedRectangle(cornerRadius: 16).foregroundStyle(.gray).opacity(0.1)
                         }
                         Spacer()
                         
@@ -422,8 +434,8 @@ struct ContentView: View {
         } label: {
             
             Image(systemName: "square.and.pencil")
-                .font(.system(size: 24, weight: .bold))
-                .contentShape(Rectangle())
+                .font(.system(size: 20, weight: .bold))
+                //.contentShape(Rectangle())
             
         }.font(.footnote).foregroundStyle(.gray.opacity(0.3))
         

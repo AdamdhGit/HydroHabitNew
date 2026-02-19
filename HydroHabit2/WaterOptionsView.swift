@@ -113,6 +113,7 @@ struct WaterOptionsView: View {
                         newItem.id = UUID()
                         newItem.waterAmount = Double(quickAddValue1) ?? 0
                         newItem.dateSaved = Date()
+               
                         try? moc.save()
                         
                         dismiss()
@@ -153,6 +154,7 @@ struct WaterOptionsView: View {
                         newItem.id = UUID()
                         newItem.waterAmount = Double(quickAddValue2) ?? 0
                         newItem.dateSaved = Date()
+                    
                         try? moc.save()
                         
                         dismiss()
@@ -195,6 +197,7 @@ struct WaterOptionsView: View {
                         newItem.id = UUID()
                         newItem.waterAmount = Double(quickAddValue3) ?? 0
                         newItem.dateSaved = Date()
+              
                         try? moc.save()
                         
                         dismiss()
