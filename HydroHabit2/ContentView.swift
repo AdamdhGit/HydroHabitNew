@@ -13,10 +13,15 @@ import WidgetKit
 
 struct ContentView: View {
     
+    @State var showWaterOptions = false
+    
     @AppStorage("waterAmount") var waterAmount: Double = 0.0
     
     @Environment(\.requestReview) var requestReview
+    
     @AppStorage("waterLogCount") var waterLogCount = 0
+    //for requestReview purposes
+    
     @State var editGoalSheetShowing = false
     @State var animatedProgress = 0.0
     @Environment(\.scenePhase) var scenePhase
@@ -25,7 +30,10 @@ struct ContentView: View {
     //every future day gets checked to previous.
     
     @State var returnFromBackgroundAndNewDay = false
+    
     @State var buttonPressed = false
+    //used to animate progress circle after pressed
+    
     @State var recentIsSaved = false
     @State var recentWaterAmountSaved:Double = 0
     @Binding var goalAmount: Double
@@ -58,16 +66,9 @@ struct ContentView: View {
     }
     
     @State private var customAmount: Double = 0
-    @AppStorage("customAmountOz") private var customAmountOz: Double = 10
-    @AppStorage("customAmountL") private var customAmountL: Double = 0.10
-    @AppStorage("customAmountmL") private var customAmountmL: Double = 50
     @Binding var selectedUnitType: String
     @State var enlargeProgress: Bool = false
-    @State var entry1Saved: Bool = false
-    @State var entry2Saved: Bool = false
-    @State var entry3Saved: Bool = false
     @State var customAmountSaved: Bool = false
-    @State var disableAllButtons = false
 
     @State var setNewOpacity = false
     @State var scaleForCompletion = false
@@ -76,39 +77,6 @@ struct ContentView: View {
     @State var displayWellDoneText = false
     
     var waterUnits = ["oz", "L", "mL"]
-    
-    var quickAddValue1: String {
-        if selectedUnitType == "oz"{
-            return "8"
-        } else if selectedUnitType == "mL" {
-            return "250"
-        } else if selectedUnitType == "L" {
-            return "0.25"
-        }
-        return "0"
-    }
-    
-    var quickAddValue2: String {
-        if selectedUnitType == "oz" {
-            return "12"
-        } else if selectedUnitType == "mL" {
-            return "500"
-        } else if selectedUnitType == "L" {
-            return "0.5"
-        }
-        return "0"
-    }
-    
-    var quickAddValue3: String {
-        if selectedUnitType == "oz" {
-            return "16"
-        } else if selectedUnitType == "mL"{
-            return "750"
-        } else if selectedUnitType == "L" {
-            return "0.75"
-        }
-        return "0"
-    }
 
         var body: some View {
             
@@ -136,7 +104,7 @@ struct ContentView: View {
                         ZStack {
                             progressCirclesView
                                 .onChange(of: buttonPressed) { _,_ in
-                                    disableAllButtons = true
+                                 
                                     animateButtonsAndProgressCircle()
                                     
                                     
@@ -171,11 +139,7 @@ struct ContentView: View {
                             .scaleEffect(enlargeProgress ? 1.2 : 1)
                             .offset(y:-20)
                         
-                        //Text("Well Done.").foregroundStyle(.cyan).fontWeight(.light).font(.title3).padding(.top, -15)
-                        
                         HStack {
-                            
-                            //quickAddText
                             
                             Spacer()
                             
@@ -198,28 +162,7 @@ struct ContentView: View {
                          
                          }.padding(.top, 20)
                          */
-                        VStack{
-                            quickAddButtonsView
-                            
-                            
-                            
-                            HStack {
-                                
-                                
-                                customAmountSliders.tint(.blue)
-                                
-                                Spacer()
-                                
-                                slidersDisplayedValues
-                                
-                                logButton
-                                
-                                Spacer()
-                                
-                            }
-                        }.padding().background{
-                            RoundedRectangle(cornerRadius: 16).foregroundStyle(.gray).opacity(0.1)
-                        }
+                   
                         
                         HStack {
                             
@@ -273,14 +216,13 @@ struct ContentView: View {
                     
                 }.padding(.horizontal)
                 
+                //MARK: water track button
                 VStack{
                     Spacer()
-                    HStack{
-                        Spacer()
                         Button {
-                            // action
+                            showWaterOptions = true
                         } label: {
-                            Image(systemName: entry3Saved ? "checkmark" : "plus")
+                            Image(systemName: "plus")
                                 .font(.system(size: 24, weight: .bold))
                                 .foregroundColor(.white)
                                 .frame(width: 50, height: 50)
@@ -298,26 +240,20 @@ struct ContentView: View {
                             }
                         )
                         .buttonStyle(.plain)
-                    }
                     
-                }.padding(.trailing, 30).padding(.bottom)
+                    
+                }
                 //button vstack end
                 
+            }
+            .sheet(isPresented: $showWaterOptions) {
+                WaterOptionsView(selectedUnitType: $selectedUnitType, waterLogCount: $waterLogCount, buttonPressed: $buttonPressed, waterAmount: $waterAmount, customAmount: $customAmount, goalAmount: $goalAmount, recentIsSaved: $recentIsSaved)
             }
         }
     
     //MARK: Views and Functions
     
-    func displaySliderValues(amount: Double) -> String {
-        if selectedUnitType == "oz" {
-            return String(format: "%.0f", amount)
-        } else if selectedUnitType == "L" {
-            return String(format: "%.2f", ((amount * 100).rounded() / 100))
-        } else if selectedUnitType == "mL" {
-            return String(format: "%.0f", amount)
-        }
-        return ""
-    }
+
     
     //format the number displayed
     func displayUnitWithPrefixes(amount: Double) -> String {
@@ -393,10 +329,6 @@ struct ContentView: View {
         }
     }
     
-    var quickAddText: some View {
-        Text("Quick Add").foregroundStyle(.white)
-    }
-    
     var undoRecentButton: some View {
         Button {
             
@@ -452,191 +384,9 @@ struct ContentView: View {
         saveAllWidgetData()
     }
     
-    func logCustomAmount() {
-        
-        waterLogCount += 1
-        
-        if selectedUnitType == "oz" {
-            customAmount = customAmountOz
-        } else if selectedUnitType == "L" {
-            customAmount = customAmountL
-        } else if selectedUnitType == "mL" {
-            customAmount = customAmountmL
-        }
-        
-        customAmountSaved = true
-        
-        buttonPressed.toggle()
-        
-        waterAmount += customAmount
-        
-        saveAllWidgetData()
-        
-        recentIsSaved = true
-        recentWaterAmountSaved = Double(customAmount)
-    }
+  
     
-    var quickAddButtonsView: some View {
-        HStack(spacing: 50){
-            
-            Button {
-                
-                buttonPressed.toggle()
-                waterLogCount += 1
-                entry1Saved = true
-                waterAmount += Double(quickAddValue1) ?? 0
-                saveAllWidgetData()
-                
-                recentIsSaved = true
-                recentWaterAmountSaved = Double(quickAddValue1) ?? 0
-                
-            } label: {
-                
-                ZStack {
-                      // Base circle with gradient fill for depth
-                    Circle().fill(Color.blue.opacity(0.4))
-                           .frame(width: 60, height: 60)
-
-                      VStack {
-                          Image(systemName: entry1Saved ? "checkmark" : "plus")
-                              .font(.system(size: 24, weight: .bold))
-                              .foregroundStyle(
-                                  entry2Saved || entry3Saved || customAmountSaved ? .gray : .white
-                              )
-                              .padding(.bottom, 5)
-                          Text("\(quickAddValue1)\(displayUnitType())")
-                              .font(.caption2.bold())
-                              .foregroundColor(.white)
-                      }
-                  }
-            }
-            .disabled(disableAllButtons)
-            
-            
-            Button {
-                
-                buttonPressed.toggle()
-                waterLogCount += 1
-                entry2Saved = true
-                waterAmount += Double(quickAddValue2) ?? 0
-                saveAllWidgetData()
-                
-                recentIsSaved = true
-                recentWaterAmountSaved = Double(quickAddValue2) ?? 0
-                
-            } label: {
-                
-                ZStack {
-                    // Base circle with gradient fill for depth
-                    Circle().fill(Color.blue.opacity(0.4))
-                           .frame(width: 60, height: 60)
-
-                    VStack {
-                        Image(systemName: entry2Saved ? "checkmark" : "plus")
-                            .font(.system(size: 24, weight: .bold))
-                            .foregroundStyle(
-                                entry1Saved || entry3Saved || customAmountSaved ? .gray : .white
-                            )
-                          
-                            .padding(.bottom, 5)
-                        Text("\(quickAddValue2)\(displayUnitType())")
-                            .font(.caption2.bold())
-                            .foregroundColor(.white)
-                    }
-                }
-            }
-            .disabled(disableAllButtons)
-            
-            Button {
-                
-                buttonPressed.toggle()
-                waterLogCount += 1
-                entry3Saved = true
-                waterAmount += Double(quickAddValue3) ?? 0
-                
-                saveAllWidgetData()
-                
-                recentIsSaved = true
-                recentWaterAmountSaved = Double(quickAddValue3) ?? 0
-                
-            } label: {
-                
-                ZStack {
-                    // Base circle with gradient fill for depth
-                    Circle().fill(Color.blue.opacity(0.4))
-                           .frame(width: 60, height: 60)
-
-                    VStack {
-                        Image(systemName: entry3Saved ? "checkmark" : "plus")
-                            .font(.system(size: 24, weight: .bold))
-                            .foregroundStyle(
-                                entry1Saved || entry2Saved || customAmountSaved ? .gray : .white
-                            )
-                           
-                            .padding(.bottom, 5)
-                        Text("\(quickAddValue3)\(displayUnitType())")
-                            .font(.caption2.bold())
-                            .foregroundColor(.white)
-                    }
-                }
-            }
-            .disabled(disableAllButtons)
-            
-        }
-    }
     
-    var logButton: some View {
-        Button{
-            
-          logCustomAmount()
-            
-            
-        }label:{
-            
-            Image(systemName: entry3Saved ? "checkmark" : "plus")
-                .font(.system(size: 24, weight: .bold))
-                .foregroundStyle(
-                    entry1Saved || entry2Saved || entry3Saved ? .gray : .white
-                )
-                .foregroundStyle(.white)
-                .frame(width: 50, height: 50)
-                .background(
-                            Circle()
-                                .fill(Color.blue)
-                        )
-                        .contentShape(Circle())            // makes the tap area circular
-            
-        }
-        .buttonStyle(.plain)
-        .onChange(of: waterLogCount) { _, newValue in
-                if newValue == 3 || newValue == 30 || newValue == 100  {
-                    requestReview()
-                }
-        }
-    }
-    
-    var customAmountSliders: some View {
-        HStack{
-            //sliders
-            if selectedUnitType == "oz" {
-                
-                Slider(value: $customAmountOz, in: 1...32, step: 1).frame(width: 150)
-                
-            } else if selectedUnitType == "L" {
-                
-                Slider(value: $customAmountL, in: 0.25...2.00, step: 0.25).frame(width: 150)
-                    .onChange(of: customAmountL) { _, _ in
-                        print(customAmountL)
-                        print(displaySliderValues(amount: customAmountL))
-                    }
-                
-            } else if selectedUnitType == "mL" {
-                
-                Slider(value: $customAmountmL, in: 50...2000, step: 50).frame(width: 150)
-                
-            }
-        }
-    }
     
     var progressCirclesView: some View {
         
@@ -666,25 +416,6 @@ struct ContentView: View {
     
     var progressWaterDroplet: some View {
         Image(systemName: "drop").foregroundStyle(.blue).font(.title).padding(.bottom, 10).bold().shadow(color: .blue, radius: 10, x: 0, y: 0)
-    }
-    
-    var slidersDisplayedValues: some View {
-        HStack{
-            //slider unit type text
-            if selectedUnitType == "oz" {
-                
-                Text("\(displaySliderValues(amount: customAmountOz)) \(displayUnitType())").foregroundStyle(.blue).frame(width: 75)
-                
-            } else if selectedUnitType == "L" {
-                
-                Text("\(displaySliderValues(amount: customAmountL)) \(displayUnitType())").foregroundStyle(.blue).frame(width: 75)
-                
-            } else if selectedUnitType == "mL" {
-                
-                Text("\(displaySliderValues(amount: customAmountmL)) \(displayUnitType())").foregroundStyle(.blue).frame(width: 75)
-                
-            }
-        }.frame(width:75)
     }
     
     //12:01am log entry, saved day is -1, i close app, i reopen, saved day is still -1, so saved day isn't equal to current day, so resets.
@@ -817,11 +548,9 @@ struct ContentView: View {
             withAnimation{
                 enlargeProgress = false
             }
-            entry1Saved = false
-            entry2Saved = false
-            entry3Saved = false
+            
             customAmountSaved = false
-            disableAllButtons = false
+           
         }
     }
     
