@@ -11,6 +11,7 @@ import WidgetKit
 struct WaterOptionsView: View {
     
     @Environment(\.requestReview) var requestReview
+    @Environment(\.dismiss) var dismiss
     
     @Binding var selectedUnitType: String
     @Binding var waterLogCount: Int
@@ -65,120 +66,154 @@ struct WaterOptionsView: View {
     }
     
     var body: some View {
-        VStack{
-   
-                //small
-                Button {
-                    
-                    buttonPressed.toggle()
-                    waterLogCount += 1
-                   
-                    waterAmount += Double(quickAddValue1) ?? 0
-                    saveAllWidgetData()
-                    
-                    recentIsSaved = true
-                    recentWaterAmountSaved = Double(quickAddValue1) ?? 0
-                    
-                    
-                } label: {
-                    
-                    ZStack {
-                        // Base circle with gradient fill for depth
-                        Circle().fill(Color.blue.opacity(0.4))
-                            .frame(width: 60, height: 60)
+        ZStack{
+
+                VStack{
+                    HStack{
                         
-                        VStack {
-                            Image(systemName:"cup.and.saucer.fill")
-                                .font(.system(size: 24, weight: .bold))
-                              
+                        Spacer()
+                        
+                        Button{
                             
-                            Text("\(quickAddValue1)\(displayUnitType())")
-                                .font(.caption2.bold())
-                                .foregroundColor(.white)
+                            dismiss()
+                            
+                        }label:{
+                            
+                            Image(systemName: "xmark")
+                                .font(.system(size: 24))
+                                .foregroundStyle(.white)
+                                .frame(width: 50, height: 50)
+                                .contentShape(Rectangle())            // makes the tap area circular
+                            
                         }
-                    }
+                        
+                    }.padding([.trailing, .top])
+                    Spacer()
                 }
-               
+                
+            VStack{
                
                 
-                //medium
-                Button {
-                    
-                    buttonPressed.toggle()
-                    waterLogCount += 1
-                  
-                    waterAmount += Double(quickAddValue2) ?? 0
-                    saveAllWidgetData()
-                    
-                    recentIsSaved = true
-                    recentWaterAmountSaved = Double(quickAddValue2) ?? 0
-                    
-                   
-                    
-                } label: {
-                    
-                    ZStack {
-                        // Base circle with gradient fill for depth
-                        Circle().fill(Color.blue.opacity(0.4))
-                               .frame(width: 60, height: 60)
-
-                        VStack {
-                            Image(systemName: "mug.fill")
-                                .font(.system(size: 24, weight: .bold))
-                               
+                HStack(spacing: 15){
+                    //small
+                    Button {
+                        
+                        buttonPressed.toggle()
+                        waterLogCount += 1
+                        
+                        waterAmount += Double(quickAddValue1) ?? 0
+                        saveAllWidgetData()
+                        
+                        recentIsSaved = true
+                        recentWaterAmountSaved = Double(quickAddValue1) ?? 0
+                        
+                        dismiss()
+                    } label: {
+                        
+                        ZStack {
+                            // Base circle with gradient fill for depth
+                            Circle().fill(Color.blue.opacity(0.4))
+                                .frame(width: 60, height: 60)
                             
-                            Text("\(quickAddValue2)\(displayUnitType())")
-                                .font(.caption2.bold())
-                                .foregroundColor(.white)
+                            VStack {
+                                Image(systemName:"cup.and.saucer.fill")
+                                    .font(.system(size: 24, weight: .bold))
+                                
+                                
+                                Text("\(quickAddValue1)\(displayUnitType())")
+                                    .font(.caption2.bold())
+                                    .foregroundColor(.white)
+                            }
                         }
                     }
-                }
-               
-              
-                
-                //large
-                Button {
                     
-                    buttonPressed.toggle()
-                    waterLogCount += 1
-                   
-                    waterAmount += Double(quickAddValue3) ?? 0
                     
-                    saveAllWidgetData()
                     
-                    recentIsSaved = true
-                    recentWaterAmountSaved = Double(quickAddValue3) ?? 0
-                    
-                  
-                    
-                } label: {
-                    
-                    ZStack {
-                        // Base circle with gradient fill for depth
-                        Circle().fill(Color.blue.opacity(0.4))
-                               .frame(width: 60, height: 60)
-
-                        VStack {
-                            Image(systemName: "waterbottle.fill")
-                                .font(.system(size: 24, weight: .bold))
-                               
+                    //medium
+                    Button {
+                        
+                        buttonPressed.toggle()
+                        waterLogCount += 1
+                        
+                        waterAmount += Double(quickAddValue2) ?? 0
+                        saveAllWidgetData()
+                        
+                        recentIsSaved = true
+                        recentWaterAmountSaved = Double(quickAddValue2) ?? 0
+                        
+                        dismiss()
+                        
+                    } label: {
+                        
+                        ZStack {
+                            // Base circle with gradient fill for depth
+                            Circle().fill(Color.blue.opacity(0.4))
+                                .frame(width: 60, height: 60)
                             
-                            Text("\(quickAddValue3)\(displayUnitType())")
-                                .font(.caption2.bold())
-                                .foregroundColor(.white)
+                            VStack {
+                                Image(systemName: "mug.fill")
+                                    .font(.system(size: 24, weight: .bold))
+                                
+                                
+                                Text("\(quickAddValue2)\(displayUnitType())")
+                                    .font(.caption2.bold())
+                                    .foregroundColor(.white)
+                            }
                         }
                     }
+                    
+                    
+                    
+                    //large
+                    Button {
+                        
+                        buttonPressed.toggle()
+                        waterLogCount += 1
+                        
+                        waterAmount += Double(quickAddValue3) ?? 0
+                        
+                        saveAllWidgetData()
+                        
+                        recentIsSaved = true
+                        recentWaterAmountSaved = Double(quickAddValue3) ?? 0
+                        
+                        dismiss()
+                        
+                    } label: {
+                        
+                        ZStack {
+                            // Base circle with gradient fill for depth
+                            Circle().fill(Color.blue.opacity(0.4))
+                                .frame(width: 60, height: 60)
+                            
+                            VStack {
+                                Image(systemName: "waterbottle.fill")
+                                    .font(.system(size: 24, weight: .bold))
+                                
+                                
+                                Text("\(quickAddValue3)\(displayUnitType())")
+                                    .font(.caption2.bold())
+                                    .foregroundColor(.white)
+                            }
+                        }
+                    }
+                    
                 }
-              
+                .padding(.bottom, 20)
                 
-                //custom
-                HStack{
-                    customAmountSliders.tint(.blue)
-                    slidersDisplayedValues
-                    logButton
-                }
-               
+                Divider()
+                    
+                    //custom
+                    HStack{
+                        customAmountSliders.tint(.blue)//.colorMultiply(.blue)
+                        slidersDisplayedValues
+                        logButton
+                    }.padding(.top, 20)
+                
+                
             
+                
+            }
         }
     }
     
@@ -229,17 +264,18 @@ struct WaterOptionsView: View {
             
           logCustomAmount()
             
+          dismiss()
             
         }label:{
             
-            Image(systemName: "plus")
-                .font(.system(size: 24, weight: .bold))
+            Image(systemName: "checkmark")
+                .font(.system(size: 24))
                 
                 .foregroundStyle(.white)
                 .frame(width: 50, height: 50)
                 .background(
                             Circle()
-                                .fill(Color.blue)
+                                .fill(Color.blue.opacity(0.4))
                         )
                         .contentShape(Circle())            // makes the tap area circular
             

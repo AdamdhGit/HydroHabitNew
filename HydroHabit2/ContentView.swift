@@ -248,6 +248,7 @@ struct ContentView: View {
             }
             .sheet(isPresented: $showWaterOptions) {
                 WaterOptionsView(selectedUnitType: $selectedUnitType, waterLogCount: $waterLogCount, buttonPressed: $buttonPressed, waterAmount: $waterAmount, customAmount: $customAmount, goalAmount: $goalAmount, recentIsSaved: $recentIsSaved, recentWaterAmountSaved: $recentWaterAmountSaved, customAmountSaved: $customAmountSaved)
+                    .presentationDetents([.medium])
             }
         }
     
