@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import WidgetKit
 
 struct WaterOptionsView: View {
     
@@ -18,6 +19,8 @@ struct WaterOptionsView: View {
     @Binding var customAmount: Double
     @Binding var goalAmount: Double
     @Binding var recentIsSaved: Bool
+    @Binding var recentWaterAmountSaved: Double
+    @Binding var customAmountSaved: Bool
     
     @AppStorage("customAmountOz") private var customAmountOz: Double = 10
     @AppStorage("customAmountL") private var customAmountL: Double = 0.10
