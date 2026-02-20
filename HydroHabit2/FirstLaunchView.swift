@@ -40,173 +40,188 @@ struct FirstLaunchView: View {
                     
                 ZStack{
                   
-                    VStack{
-                        Spacer()
-                        hydroHabitIntroText
-                        
-                        Image("waterCups")
-                            .resizable()
-                            .frame(width: 300, height: 300)
-                           
-                        Spacer()
-                        /*
-                        Button("Get Started"){
-                            selectedTab = 1
-                        }.buttonStyle(.borderedProminent).tint(Color(red: 59/255, green: 89/255, blue: 152/255))
-                            .padding(.bottom, 150)
-                        */
-                        Button {
-                            selectedTab = 1
-                        } label: {
-                            Text("Get Started")
-                                .fontWeight(.semibold)
-                                .foregroundColor(.white)
-                                .frame(width: 200, height: 50)
-                                .background(
-                                    RoundedRectangle(cornerRadius: 12)
-                                        .fill(Color(red: 59/255, green: 89/255, blue: 152/255))
-                                )
-                        }
-                        .buttonStyle(.plain)
-                        .padding(.horizontal, 40)
-                        .padding(.bottom, 150)
-                    }
-                    
+                    ScrollView{
+                        VStack{
+                            Spacer()
+                            hydroHabitIntroText.offset(y: -40)
+                            
+                            Image("waterCups")
+                                .resizable()
+                                .frame(width: 300, height: 300)
+                            
+                            Spacer()
+                            /*
+                             Button("Get Started"){
+                             selectedTab = 1
+                             }.buttonStyle(.borderedProminent).tint(Color(red: 59/255, green: 89/255, blue: 152/255))
+                             .padding(.bottom, 150)
+                             */
+                            Button {
+                                selectedTab = 1
+                            } label: {
+                                Text("Get Started")
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(.white)
+                                    .frame(width: 200, height: 50)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 12)
+                                            .fill(Color(red: 59/255, green: 89/255, blue: 152/255))
+                                    )
+                            }
+                            .buttonStyle(.plain)
+                            .padding(.horizontal, 40)
+                            
+                            Spacer().frame(height: 300)
+                        }.frame(minHeight: UIScreen.main.bounds.height).padding(.top, 70)
+                    }.scrollDisabled(true)
                 }.tag(0)
                 
                 ZStack{
                     
-                    VStack{
-                      
-                        Text("Pick your gender").padding(.top, 30)
-                        genderPicker.padding()
-                        Image(selectedGender == "Male" ? "manWater" : "womanWater")
-                            .resizable()
-                            .frame(width: 300, height: 300)
-                        Spacer()
-                        Button {
-                            selectedTab = 2
-                        } label: {
-                            Text("Next")
-                                .fontWeight(.semibold)
-                                .foregroundColor(.white)
-                                .frame(width: 200, height: 50)
-                                .background(
-                                    RoundedRectangle(cornerRadius: 12)
-                                        .fill(Color(red: 59/255, green: 89/255, blue: 152/255))
-                                )
-                        }
-                        .buttonStyle(.plain)
-                        .padding(.horizontal, 40)
-                        .padding(.bottom, 150)
-                    }.padding(.top, 70)
+                    ScrollView{
+                        VStack{
+                            
+                            Text("Pick your gender").padding(.top, 30)
+                            genderPicker.padding()
+                            Image(selectedGender == "Male" ? "manWater" : "womanWater")
+                                .resizable()
+                                .frame(width: 300, height: 300)
+                            Spacer()
+                            Button {
+                                selectedTab = 2
+                            } label: {
+                                Text("Next")
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(.white)
+                                    .frame(width: 200, height: 50)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 12)
+                                            .fill(Color(red: 59/255, green: 89/255, blue: 152/255))
+                                    )
+                            }
+                            .buttonStyle(.plain)
+                            .padding(.horizontal, 40)
+                           
+                            Spacer()
+                                .frame(height: 300)
+                            
+                        }.frame(minHeight: UIScreen.main.bounds.height).padding(.top, 70)
+                    }.scrollDisabled(true)
                 }.tag(1)
                 
                 ZStack{
                    
-                    
-                    VStack{
-                        
-                        
-                        howWouldYouLikeToMeasureText.padding(.horizontal)
-                        unitTypePicker.padding(.horizontal)
-                        Image("waterMeasure")
-                            .resizable()
-                            .frame(width: 300, height: 300)
-                           
-                        Spacer()
-                        Button {
-                            selectedTab = 3
-                        } label: {
-                            Text("Next")
-                                .fontWeight(.semibold)
-                                .foregroundColor(.white)
-                                .frame(width: 200, height: 50)
-                                .background(
-                                    RoundedRectangle(cornerRadius: 12)
-                                        .fill(Color(red: 59/255, green: 89/255, blue: 152/255))
-                                )
-                        }
-                        .buttonStyle(.plain)
-                        .padding(.horizontal, 40)
-                        .padding(.bottom, 150)
-                    }.padding(.top, 70)
-
+                    ScrollView{
+                        VStack{
+                            
+                            
+                            howWouldYouLikeToMeasureText.padding(.horizontal)
+                            unitTypePicker.padding(.horizontal)
+                            Image("waterMeasure")
+                                .resizable()
+                                .frame(width: 300, height: 300)
+                            
+                            Spacer()
+                            Button {
+                                selectedTab = 3
+                            } label: {
+                                Text("Next")
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(.white)
+                                    .frame(width: 200, height: 50)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 12)
+                                            .fill(Color(red: 59/255, green: 89/255, blue: 152/255))
+                                    )
+                            }
+                            .buttonStyle(.plain)
+                            .padding(.horizontal, 40)
+                            Spacer()
+                                .frame(height: 300)
+                        }.frame(minHeight: UIScreen.main.bounds.height).padding(.top, 70)
+                    }.scrollDisabled(true)
                 }.tag(2)
                 
                 ZStack{
                     
-                    VStack{
-                        
-                        
-                        selectIntakeGoalText
-                        
-                        intakeDisclaimerText.padding(.horizontal).padding(.bottom, 20).padding(.top, 2)
-                        
-                        intakeGoalPicker.padding(.horizontal)
-                        
-                        customGoalEntryView
-                       
-                        
+                    ScrollView{
+                        VStack{
                             
-                     
-                        
-                        Spacer()
-                        Image("waterTrophy")
-                            .resizable()
-                            .frame(width: 150, height: 150)
-                        Button {
-                            selectedTab = 4
-                        } label: {
-                            Text("Next")
-                                .fontWeight(.semibold)
-                                .foregroundColor(.white)
-                                .frame(width: 200, height: 50)
-                                .background(
-                                    RoundedRectangle(cornerRadius: 12)
-                                        .fill(Color(red: 59/255, green: 89/255, blue: 152/255))
-                                )
-                        }
-                        .buttonStyle(.plain)
-                        .padding(.horizontal, 40)
-                        .padding(.bottom, 150)
-                        .disabled(isCustomGoalInvalid)
-                    }.padding(.top, 70)
-
+                            
+                            selectIntakeGoalText
+                            
+                            intakeDisclaimerText.padding(.horizontal).padding(.bottom, 20).padding(.top, 2)
+                            
+                            intakeGoalPicker.padding(.horizontal)
+                            
+               
+                                customGoalEntryView.frame(height: 100)
+                           
+                            
+                            Spacer()
+                            Image("waterTrophy")
+                                .resizable()
+                                .frame(width: 150, height: 150)
+                           
+                            Button {
+                                customGoalTextFocused = false
+                                selectedTab = 4
+                            } label: {
+                                Text("Next")
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(.white)
+                                    .frame(width: 200, height: 50)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 12)
+                                            .fill(Color(red: 59/255, green: 89/255, blue: 152/255))
+                                    )
+                            }
+                            .buttonStyle(.plain)
+                            .padding(.horizontal, 40)
+                            .disabled(isCustomGoalInvalid)
+                            
+                            Spacer()
+                                .frame(height: 300)
+                            
+                        }.frame(minHeight: UIScreen.main.bounds.height).padding(.top, 70)
+                    }.scrollIndicators(.hidden)
                 }.tag(3)
 
                    
                 ZStack{
                    
-                    VStack{
-                        
-                        Text("You’re all set! Your hydration journey starts now.").foregroundStyle(.white).fontWeight(.light).font(.title3)
-                        
-                        Image("beachChair")
-                            .resizable()
-                            .frame(width: 350, height: 350)
-                       
-                        Spacer()
-                        
-                        Button {
-                            saveGoalAmount()
-                            setupFinished = true
-                        } label: {
-                            Text("Start Hydrating")
-                                .fontWeight(.semibold)
-                                .foregroundColor(.white)
-                                .frame(width: 200, height: 50)
-                                .background(
-                                    RoundedRectangle(cornerRadius: 12)
-                                        .fill(Color(red: 59/255, green: 89/255, blue: 152/255))
-                                )
-                        }
-                        .buttonStyle(.plain)
-                        .padding(.horizontal, 40)
-                        .padding(.bottom, 150)
-                        
-                    }.padding(.top, 70)
-
+                    ScrollView{
+                        VStack{
+                            
+                            Text("You’re all set! Your hydration journey starts now.").foregroundStyle(.white).fontWeight(.light).font(.title3)
+                            
+                            Image("beachChair")
+                                .resizable()
+                                .frame(width: 350, height: 350)
+                            
+                            Spacer()
+                            
+                            Button {
+                                saveGoalAmount()
+                                setupFinished = true
+                            } label: {
+                                Text("Start Hydrating")
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(.white)
+                                    .frame(width: 200, height: 50)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 12)
+                                            .fill(Color(red: 59/255, green: 89/255, blue: 152/255))
+                                    )
+                            }
+                            .buttonStyle(.plain)
+                            .padding(.horizontal, 40)
+                            
+                            Spacer()
+                                .frame(height: 300)
+                            
+                        }.frame(minHeight: UIScreen.main.bounds.height).padding(.top, 100)
+                    }.scrollDisabled(true)
                 }.tag(4)
                     
                  
@@ -215,14 +230,20 @@ struct FirstLaunchView: View {
                     
                 
                 
-            }.tabViewStyle(PageTabViewStyle(indexDisplayMode: .automatic))
+            }
+                .tabViewStyle(PageTabViewStyle(indexDisplayMode: .automatic))
+                .ignoresSafeArea(.keyboard)
             // hides dots
             
             if selectedTab > 0 {
                 VStack {
                     HStack {
                         Button {
+                            
+                            customGoalTextFocused = false
+                            
                             selectedTab -= 1
+                            
                         } label: {
                             Image(systemName: "chevron.left")
                                 .font(.system(size: 20, weight: .semibold))
@@ -333,33 +354,46 @@ struct FirstLaunchView: View {
     }
     
     var customGoalEntryView: some View {
+
         VStack {
             
-            if (dailyGoal == "Custom Goal") && customGoalSelected {
+            Text("Enter Your Daily Intake Goal in \(selectedUnitType)").foregroundStyle(.white).padding(.top, 15).font(.callout)
+            
+            TextField("Custom Goal Amount in \(selectedUnitType)", text: $customGoalAmount)
+                .focused($customGoalTextFocused)
                 
-                VStack {
-                    
-                    Text("Enter Your Daily Intake Goal in \(selectedUnitType)").foregroundStyle(.white).padding(.top, 15).font(.callout)
-                        
-                        TextField("Custom Goal Amount in \(selectedUnitType)", text: $customGoalAmount)
-                            .focused($customGoalTextFocused)
-                            .keyboardType(selectedUnitType == "L" ? .decimalPad : .numberPad).padding().onChange(of: customGoalAmount) { _, newValue in
-                            if newValue.count > 5 {
-                                customGoalAmount = String(newValue.prefix(5))
-                            }
-                        }.background{
-                            RoundedRectangle(cornerRadius: 10).fill(Color.gray.opacity(0.25)).frame(height: 40)
-                        }
-                        .frame(width: 300)
-                        .onAppear {
-                            customGoalTextFocused.toggle()
-                        }
-                        .submitLabel(.done)
-                        
-                    
+                .padding()
+                .onChange(of: customGoalAmount) { _, newValue in
+                    if newValue.count > 5 {
+                        customGoalAmount = String(newValue.prefix(5))
+                    }
+                }.background{
+                    RoundedRectangle(cornerRadius: 10).fill(Color.gray.opacity(0.25)).frame(height: 40)
                 }
+                .frame(width: 300)
+                .submitLabel(.done)
+                .keyboardType(selectedUnitType == "L" ? .decimalPad : .numberPad)
+                .toolbar {
+                        ToolbarItemGroup(placement: .keyboard) {
+                            Spacer()
+                            Button("Done") {
+                                customGoalTextFocused = false
+                                saveGoalAmount() // optional
+                            }
+                        }
+                    }
+            
+            
+        }
+        .onChange(of: customGoalSelected) { oldValue, newValue in
+            // Only focus if the custom goal entry is actually visible
+            if newValue {
+                customGoalTextFocused = true
+            } else {
+                customGoalTextFocused = false
             }
         }
+        .opacity(customGoalSelected ? 1 : 0)      // Fade in/out
         //.transition(.slide)
         .onChange(of: dailyGoal) { oldValue, newValue in
             if newValue == "Custom Goal" {
