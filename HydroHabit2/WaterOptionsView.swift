@@ -19,9 +19,8 @@ struct WaterOptionsView: View {
     @Binding var selectedUnitType: String
     @Binding var waterLogCount: Int
     @Binding var buttonPressed: Bool
-    @Binding var waterAmount: Double
-    @Binding var customAmount: Double
-    @Binding var goalAmount: Double
+    @Binding var waterAmountML: Double
+    @Binding var goalAmountML: Double
     @Binding var recentWaterAmountSaved: Double
     @Binding var customAmountSaved: Bool
     
@@ -30,7 +29,7 @@ struct WaterOptionsView: View {
     @AppStorage("customAmountmL") private var customAmountmL: Double = 50
     
     var goalPercent:Double {
-        let percent = (Double(waterAmount) / Double(goalAmount)) * Double(100)
+        let percent = (Double(waterAmountML) / Double(goalAmountML)) * Double(100)
         return percent
     }
     
@@ -103,7 +102,11 @@ struct WaterOptionsView: View {
                         buttonPressed.toggle()
                         waterLogCount += 1
                         
-                        waterAmount += Double(quickAddValue1) ?? 0
+                        let amount = Double(quickAddValue1) ?? 0
+                        let amountML = convertToML(amount)
+                        waterAmountML += amountML
+                        
+                        
                         saveAllWidgetData()
                         
                     
@@ -111,7 +114,7 @@ struct WaterOptionsView: View {
                         
                         let newItem = WaterLog(context: moc)
                         newItem.id = UUID()
-                        newItem.waterAmount = Double(quickAddValue1) ?? 0
+                        newItem.waterAmountML = amountML
                         newItem.dateSaved = Date()
                
                         try? moc.save()
@@ -122,7 +125,7 @@ struct WaterOptionsView: View {
                         ZStack {
                             // Base circle with gradient fill for depth
                             Circle().fill(Color.blue.opacity(0.4))
-                                .frame(width: 60, height: 60)
+                                .frame(width: 70, height: 70)
                             
                             VStack {
                                 Image(systemName:"cup.and.saucer.fill")
@@ -144,7 +147,10 @@ struct WaterOptionsView: View {
                         buttonPressed.toggle()
                         waterLogCount += 1
                         
-                        waterAmount += Double(quickAddValue2) ?? 0
+                        let amount = Double(quickAddValue2) ?? 0
+                        let amountML = convertToML(amount)
+                        waterAmountML += amountML
+                        
                         saveAllWidgetData()
                         
                   
@@ -152,7 +158,7 @@ struct WaterOptionsView: View {
                         
                         let newItem = WaterLog(context: moc)
                         newItem.id = UUID()
-                        newItem.waterAmount = Double(quickAddValue2) ?? 0
+                        newItem.waterAmountML = amountML
                         newItem.dateSaved = Date()
                     
                         try? moc.save()
@@ -164,7 +170,7 @@ struct WaterOptionsView: View {
                         ZStack {
                             // Base circle with gradient fill for depth
                             Circle().fill(Color.blue.opacity(0.4))
-                                .frame(width: 60, height: 60)
+                                .frame(width: 70, height: 70)
                             
                             VStack {
                                 Image(systemName: "mug.fill")
@@ -186,7 +192,9 @@ struct WaterOptionsView: View {
                         buttonPressed.toggle()
                         waterLogCount += 1
                         
-                        waterAmount += Double(quickAddValue3) ?? 0
+                        let amount = Double(quickAddValue3) ?? 0
+                        let amountML = convertToML(amount)
+                        waterAmountML += amountML
                         
                         saveAllWidgetData()
                         
@@ -195,7 +203,7 @@ struct WaterOptionsView: View {
                         
                         let newItem = WaterLog(context: moc)
                         newItem.id = UUID()
-                        newItem.waterAmount = Double(quickAddValue3) ?? 0
+                        newItem.waterAmountML = amountML
                         newItem.dateSaved = Date()
               
                         try? moc.save()
@@ -209,7 +217,7 @@ struct WaterOptionsView: View {
                         ZStack {
                             // Base circle with gradient fill for depth
                             Circle().fill(Color.blue.opacity(0.4))
-                                .frame(width: 60, height: 60)
+                                .frame(width: 70, height: 70)
                             
                             VStack {
                                 Image(systemName: "waterbottle.fill")
@@ -316,30 +324,36 @@ struct WaterOptionsView: View {
     func logCustomAmount() {
         
         waterLogCount += 1
-        
-        if selectedUnitType == "oz" {
-            customAmount = customAmountOz
-        } else if selectedUnitType == "L" {
-            customAmount = customAmountL
-        } else if selectedUnitType == "mL" {
-            customAmount = customAmountmL
-        }
-        
+        buttonPressed.toggle()
         customAmountSaved = true
         
-        buttonPressed.toggle()
+        // 1️⃣ Determine slider value based on unit
+        let valueToLog: Double = {
+            switch selectedUnitType {
+            case "oz": return customAmountOz
+            case "L":  return customAmountL
+            default:   return customAmountmL
+            }
+        }()
         
-        waterAmount += customAmount
+        // 2️⃣ Convert to mL (single source of truth)
+        let amountML = convertToML(valueToLog)
         
+        // 3️⃣ Update totals (stored ONLY in mL)
+        waterAmountML += amountML
+        
+        // 4️⃣ Save widget data
         saveAllWidgetData()
         
-     
-        recentWaterAmountSaved = Double(customAmount)
+        // 5️⃣ Save recent amount (store mL, not unit value)
+        recentWaterAmountSaved = amountML
         
+        // 6️⃣ CoreData log (store mL only)
         let newItem = WaterLog(context: moc)
         newItem.id = UUID()
-        newItem.waterAmount = Double(customAmount)
+        newItem.waterAmountML = amountML
         newItem.dateSaved = Date()
+        
         try? moc.save()
     }
     
@@ -355,27 +369,31 @@ struct WaterOptionsView: View {
     }
     
     func displayUnitType() -> String {
-        if selectedUnitType == "oz" {
-            return "oz"
-        } else if selectedUnitType == "L" {
-            return "L"
-        } else if selectedUnitType == "mL" {
-            return "mL"
-        }
-        return "oz"
+        selectedUnitType
     }
     
     func saveAllWidgetData() {
         guard let defaults = UserDefaults(suiteName: "group.HydroHabit") else { return }
         
-        defaults.set(waterAmount, forKey: "widgetWaterAmount")
-        defaults.set(goalAmount, forKey: "widgetGoalAmount")
+        defaults.set(waterAmountML, forKey: "widgetWaterAmount")
+        defaults.set(goalAmountML, forKey: "widgetGoalAmount")
         defaults.set(goalPercent, forKey: "widgetGoalPercentage")
         defaults.set(selectedUnitType, forKey: "widgetSelectedUnit")
         
         DispatchQueue.global(qos: .background).async {
                 WidgetCenter.shared.reloadTimelines(ofKind: "HydroHabit")
             }
+    }
+    
+    func convertToML(_ amount: Double) -> Double {
+        switch selectedUnitType {
+        case "oz":
+            return amount * 29.5735
+        case "L":
+            return amount * 1000
+        default: // mL
+            return amount
+        }
     }
     
 }

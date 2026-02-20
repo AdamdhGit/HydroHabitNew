@@ -170,7 +170,7 @@ struct FirstLaunchView: View {
                         .buttonStyle(.plain)
                         .padding(.horizontal, 40)
                         .padding(.bottom, 150)
-                        .disabled(dailyGoal == "Custom Goal" && customGoalAmount.isEmpty)
+                        .disabled(isCustomGoalInvalid)
                     }.padding(.top, 70)
 
                 }.tag(3)
@@ -204,7 +204,6 @@ struct FirstLaunchView: View {
                         .buttonStyle(.plain)
                         .padding(.horizontal, 40)
                         .padding(.bottom, 150)
-                        .disabled(dailyGoal == "Custom Goal" && customGoalAmount.isEmpty ? true : false)
                         
                     }.padding(.top, 70)
 
@@ -375,20 +374,23 @@ struct FirstLaunchView: View {
     }
     
     func saveGoalAmount() {
+        
+        let rawValue: Double
+        
         if dailyGoal == "Custom Goal" {
-            goalAmount = Double(customGoalAmount) ?? 0
-        } else if dailyGoal == "125 oz" {
-            goalAmount = Double(125)
-        } else if dailyGoal == "91 oz" {
-            goalAmount = Double(91)
-        } else if dailyGoal == "3.7 L" {
-            goalAmount = Double(3.7)
-        } else if dailyGoal == "2.7 L" {
-            goalAmount = Double(2.7)
-        } else if dailyGoal == "3700 mL" {
-            goalAmount = Double(3700)
-        } else if dailyGoal == "2700 mL" {
-            goalAmount = Double(2700)
+            rawValue = Double(customGoalAmount) ?? 0
+        } else {
+            rawValue = Double(dailyGoal.components(separatedBy: " ").first ?? "") ?? 0
+        }
+        
+        // Convert to mL before storing
+        switch selectedUnitType {
+        case "oz":
+            goalAmount = rawValue * 29.5735
+        case "L":
+            goalAmount = rawValue * 1000
+        default: // mL
+            goalAmount = rawValue
         }
     }
     
@@ -421,6 +423,20 @@ struct FirstLaunchView: View {
         default:
             dailyGoal = ""
         }
+    }
+    
+    var isCustomGoalInvalid: Bool {
+        // Only check if "Custom Goal" is selected
+        guard dailyGoal == "Custom Goal" else { return false }
+
+        // Must not be empty
+        guard !customGoalAmount.trimmingCharacters(in: .whitespaces).isEmpty else { return true }
+
+        // Must parse as Double; 01 for example parses into 1.0
+        guard let value = Double(customGoalAmount) else { return true }
+
+        // Must be strictly > 0
+        return value <= 0
     }
     
 }

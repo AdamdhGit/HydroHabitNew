@@ -25,7 +25,7 @@ struct ContentView: View {
     
     @State var showWaterOptions = false
     
-    @AppStorage("waterAmount") var waterAmount: Double = 0.0
+    @AppStorage("waterAmount") var waterAmountML: Double = 0.0
     
     @Environment(\.requestReview) var requestReview
     
@@ -45,13 +45,14 @@ struct ContentView: View {
     //used to animate progress circle after pressed
     
     @State var recentWaterAmountSaved:Double = 0
-    @Binding var goalAmount: Double
+    @Binding var goalAmountML: Double
     @AppStorage("goalScaleAnimationHasBeenShown") var goalScaleAnimationHasBeenShown = false
     @State var isAnimating = false
     
-    var goalPercent:Double {
-        let percent = (Double(waterAmount) / Double(goalAmount)) * Double(100)
-        return percent
+    var goalPercent: Double {
+        guard goalAmountML > 0 else { return 0 }
+        let percent = (waterAmountML / goalAmountML) * 100
+        return max(0, percent)
     }
     //99.98 rounds up from format: %.0f AND displays the decimal
     //***to enforce NON rounding formating, use .floor
@@ -60,21 +61,11 @@ struct ContentView: View {
     var formattedGoalPercent: String {
         if goalPercent >= 100 {
             return "100" // Directly show 100% when the value is 99.5 or higher
-        } else if goalPercent > 99 && goalPercent < 100 {
-            if goalPercent == floor(goalPercent) {
-                //if goalPercent has no decimals, show as whole number
-                return String(format: "%.0f", goalPercent)
-            } else {
-                //show with the decimal it has
-                return String(format: "%g", goalPercent, floor(goalPercent * 100) / 100)
-            }
-        } else if goalPercent < 90 {
+        }else  {
             return String(format: "%.0f", goalPercent)
         }
-        return String(format: "%.0f", goalPercent)
     }
     
-    @State private var customAmount: Double = 0
     @Binding var selectedUnitType: String
     @State var enlargeProgress: Bool = false
     @State var customAmountSaved: Bool = false
@@ -122,7 +113,7 @@ struct ContentView: View {
                                     
                                     resetDataOnNewDay()
                                     setAllDataOnAppear()
-                                    animatedProgress = (waterAmount / goalAmount)
+                                    animatedProgress = goalAmountML > 0 ? min(waterAmountML / goalAmountML, 1.0) : 0
                                 }
                                 .onChange(of: scenePhase) { _, newPhase in
                                     
@@ -132,35 +123,20 @@ struct ContentView: View {
                                         
                                         resetDataOnNewDay()
                                         setAllDataOnAppear()
-                                        animatedProgress = (waterAmount / goalAmount)
-                                        
-                                       
+                                        animatedProgress = goalAmountML > 0 ? min(waterAmountML / goalAmountML, 1.0) : 0
                                         
                                     }
                                 }
-                                .onChange(of: goalAmount) { _, _ in
-                                    animatedProgress = (waterAmount / goalAmount)
+                                .onChange(of: goalAmountML) { _, _ in
+                                    animatedProgress = goalAmountML > 0 ? min(waterAmountML / goalAmountML, 1.0) : 0
                                 }
                             
-                            progressWaterDroplet
+                            progressPercentageInCircle
                             
                         }.padding(.top, 60).padding(.bottom, 20)
                             .scaleEffect(enlargeProgress ? 1.2 : 1)
                             .offset(y:-20)
-                        
-                        
-                        
-                        /*
-                         HStack {
-                         
-                         //customAmountText
-                         
-                         Spacer()
-                         
-                         }.padding(.top, 20)
-                         */
                    
-                        
                         HStack {
                             
                             progressTodayText.font(.title3)
@@ -170,13 +146,6 @@ struct ContentView: View {
                         }.padding(.top, 10)
                         
                         VStack{
-                            HStack {
-                                
-                                Text("\(formattedGoalPercent)%")
-                                
-                                Spacer()
-                                
-                            }.foregroundStyle(.blue).font(.title).padding(.top, -2)
                             
                             HStack {
                                 
@@ -186,7 +155,7 @@ struct ContentView: View {
                                 
                                 editGoalButton
                                 
-                            }.padding(.top, -7)
+                            }
                         }.padding().background{
                             RoundedRectangle(cornerRadius: 16).foregroundStyle(.gray).opacity(0.1)
                         }
@@ -221,7 +190,7 @@ struct ContentView: View {
                                         
                                       
                                             HStack{
-                                                Text("\(displayUnitWithPrefixes(amount: i.waterAmount)) \(displayUnitType())")
+                                                Text("\(displayUnitWithPrefixes(amountML: i.waterAmountML)) \(displayUnitType())")
                                                     .frame(maxWidth: .infinity, alignment: .leading)
                                                 Text(i.dateSaved ?? Date(), format: .dateTime.hour().minute())
                                                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -231,13 +200,13 @@ struct ContentView: View {
                                                 Button {
                                                     
                                                     
-                                                    //undo recent
-                                                    waterAmount -= i.waterAmount
+                                                    waterAmountML = max(0, waterAmountML - i.waterAmountML)
                                                     
                                                     
                                                     
                                                     withAnimation {
-                                                        animatedProgress = (waterAmount / goalAmount)
+                                                        animatedProgress = goalAmountML > 0 ? min(waterAmountML / goalAmountML, 1.0) : 0
+                                                        
                                                     }
                                            
                                                             moc.delete(i)
@@ -277,17 +246,20 @@ struct ContentView: View {
                     
                     .onChange(of: selectedUnitType) { oldValue, newValue in
                         
-                        setDefaultCustomAmountOnUnitChange()
+                        //setDefaultCustomAmountOnUnitChange()
+                        
+                        /*
                         updateAmountsAfterUnitConversion(oldValue: oldValue, newValue: newValue)
+                        
                         
                         // Update all recent entries
                           for log in recentEntries {
                               updateRecentEntriesAfterUnitConversion(for: log, oldValue: oldValue, newValue: newValue)
                           }
-
+                        
                           // Save context
                           try? moc.save()
-                        
+                        */
                         
                        
                         
@@ -298,7 +270,7 @@ struct ContentView: View {
                     //
                     
                     .sheet(isPresented: $editGoalSheetShowing, content: {
-                        ChangeGoalView(selectedUnitType: $selectedUnitType, goalAmount: $goalAmount)
+                        ChangeGoalView(selectedUnitType: $selectedUnitType, goalAmount: $goalAmountML)
                     })
                     
                 }.padding(.horizontal)
@@ -334,7 +306,7 @@ struct ContentView: View {
                 
             }
             .sheet(isPresented: $showWaterOptions) {
-                WaterOptionsView(selectedUnitType: $selectedUnitType, waterLogCount: $waterLogCount, buttonPressed: $buttonPressed, waterAmount: $waterAmount, customAmount: $customAmount, goalAmount: $goalAmount, recentWaterAmountSaved: $recentWaterAmountSaved, customAmountSaved: $customAmountSaved)
+                WaterOptionsView(selectedUnitType: $selectedUnitType, waterLogCount: $waterLogCount, buttonPressed: $buttonPressed, waterAmountML: $waterAmountML, goalAmountML: $goalAmountML, recentWaterAmountSaved: $recentWaterAmountSaved, customAmountSaved: $customAmountSaved)
                     .presentationDetents([.medium])
             }
         }
@@ -342,7 +314,7 @@ struct ContentView: View {
     //MARK: Views and Functions
     
 
-    
+    /*
     //format the number displayed
     func displayUnitWithPrefixes(amount: Double) -> String {
         switch selectedUnitType {
@@ -355,6 +327,44 @@ struct ContentView: View {
         default: // "oz"
             // Up to 1 decimal for oz to handle conversions cleanly
             return amount.formatted(.number.precision(.fractionLength(0...1)))
+        }
+    }
+    */
+    
+    //does rounding change the value?
+    
+    /*
+    func displayUnitWithPrefixes(amount: Double) -> String {
+        switch selectedUnitType {
+            case "L":
+                let rounded = (amount * 100).rounded() / 100
+                return String(format: "%.2f", rounded)
+                
+            case "mL":
+                return String(format: "%.0f", amount.rounded())
+                
+            default: // oz
+                return String(format: "%.0f", amount.rounded())
+            }
+    }
+     */
+    
+    func displayUnitWithPrefixes(amountML: Double) -> String {
+        
+        let safeML = max(0, amountML)   // 👈 prevents negative drift
+        
+        switch selectedUnitType {
+
+        case "L":
+            let liters = safeML / 1000
+            return String(format: "%.2f", liters)
+
+        case "oz":
+            let ounces = safeML / 29.5735
+            return String(format: "%.0f", ounces.rounded())
+
+        default: // mL
+            return String(format: "%.0f", safeML.rounded())
         }
     }
     
@@ -416,11 +426,6 @@ struct ContentView: View {
             transaction.animation = nil
         }
     }
-
-    
-    var customAmountText: some View {
-        Text("Custom Amount").foregroundStyle(.white)
-    }
     
     var progressTodayText: some View {
         Text("Progress Today").foregroundStyle(.white)
@@ -442,7 +447,7 @@ struct ContentView: View {
     }
     
     var waterAmountOfGoalText: some View {
-        Text("\(displayUnitWithPrefixes(amount: waterAmount)) \(displayUnitType()) of \(displayUnitWithPrefixes(amount: goalAmount)) \(displayUnitType())").foregroundStyle(.blue).font(.title2).fontWeight(.light)
+        Text("\(displayUnitWithPrefixes(amountML: waterAmountML)) \(displayUnitType()) of \(displayUnitWithPrefixes(amountML: goalAmountML)) \(displayUnitType())").foregroundStyle(.blue).font(.title2).fontWeight(.light)
     }
     
     func setAllDataOnAppear() {
@@ -479,8 +484,11 @@ struct ContentView: View {
         }
     }
     
-    var progressWaterDroplet: some View {
-        Image(systemName: "drop").foregroundStyle(.blue).font(.title).padding(.bottom, 10).bold().shadow(color: .blue, radius: 10, x: 0, y: 0)
+    var progressPercentageInCircle: some View {
+        
+        Text("\(formattedGoalPercent)%").foregroundStyle(.blue).font(.title).bold().shadow(color: .blue, radius: 10, x: 0, y: 0)
+        
+        //Image(systemName: "drop").foregroundStyle(.blue).font(.title).padding(.bottom, 10).bold().shadow(color: .blue, radius: 10, x: 0, y: 0)
     }
     
     //12:01am log entry, saved day is -1, i close app, i reopen, saved day is still -1, so saved day isn't equal to current day, so resets.
@@ -514,7 +522,7 @@ struct ContentView: View {
                 animatedProgress = 0
             }
             
-            waterAmount = 0.0
+            waterAmountML = 0.0
             
             saveAllWidgetData()
             
@@ -524,6 +532,8 @@ struct ContentView: View {
             
         }
     }
+    
+    /*
     
     func updateAmountsAfterUnitConversion (oldValue: String, newValue: String) {
         if oldValue == "oz" && newValue == "L" {
@@ -591,6 +601,8 @@ struct ContentView: View {
         
     }
     
+    */
+    
     func animateButtonsAndProgressCircle() {
         
         
@@ -601,7 +613,7 @@ struct ContentView: View {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             // Code to execute after 2 seconds
             withAnimation{
-                animatedProgress = (waterAmount / goalAmount)
+                animatedProgress = goalAmountML > 0 ? min(waterAmountML / goalAmountML, 1.0) : 0
             }
         }
 
@@ -614,21 +626,6 @@ struct ContentView: View {
                     scaleForCompletion = true
                 }
             }
-            
-            /*
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
-                withAnimation(.easeInOut(duration: 2.0)){
-                    displayWellDoneText = true
-                }
-            }
-            
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + 6.0) {
-                withAnimation(.easeInOut(duration: 1.0)){
-                    displayWellDoneText = false
-                }
-            }
-            */
             
             DispatchQueue.main.asyncAfter(deadline: .now() + 5.1) {
                     goalScaleAnimationHasBeenShown = true
@@ -649,6 +646,7 @@ struct ContentView: View {
         }
     }
     
+    /*
     func setDefaultCustomAmountOnUnitChange() {
         if selectedUnitType == "oz" {
             customAmount = 10
@@ -658,6 +656,7 @@ struct ContentView: View {
             customAmount = 50
         }
     }
+    */
     
     func checkForReviewTrigger() {
         if waterLogCount == 3 ||
@@ -671,8 +670,8 @@ struct ContentView: View {
     func saveAllWidgetData() {
         guard let defaults = UserDefaults(suiteName: "group.HydroHabit") else { return }
         
-        defaults.set(waterAmount, forKey: "widgetWaterAmount")
-        defaults.set(goalAmount, forKey: "widgetGoalAmount")
+        defaults.set(waterAmountML, forKey: "widgetWaterAmount")
+        defaults.set(goalAmountML, forKey: "widgetGoalAmount")
         defaults.set(goalPercent, forKey: "widgetGoalPercentage")
         defaults.set(selectedUnitType, forKey: "widgetSelectedUnit")
         

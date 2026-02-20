@@ -21,7 +21,7 @@ struct HydroHabit2App: App {
     var body: some Scene {
         WindowGroup {
             if setupFinished {
-                ContentView(goalAmount: $goalAmount, selectedUnitType: $selectedUnitType).preferredColorScheme(.dark).environment(\.managedObjectContext, dataController.container.viewContext)
+                ContentView(goalAmountML: $goalAmount, selectedUnitType: $selectedUnitType).preferredColorScheme(.dark).environment(\.managedObjectContext, dataController.container.viewContext)
             } else {
                 FirstLaunchView(setupFinished: $setupFinished, selectedUnitType: $selectedUnitType, goalAmount: $goalAmount)
             }
