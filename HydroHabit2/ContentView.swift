@@ -675,6 +675,10 @@ struct ContentView: View {
         defaults.set(goalPercent, forKey: "widgetGoalPercentage")
         defaults.set(selectedUnitType, forKey: "widgetSelectedUnit")
         
+        // store the last saved day for daily refresh of widget dynamically
+           let today = Calendar.current.startOfDay(for: Date())
+           defaults.set(today, forKey: "widgetSavedDay")
+        
         DispatchQueue.global(qos: .background).async {
                 WidgetCenter.shared.reloadTimelines(ofKind: "HydroHabit")
             }

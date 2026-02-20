@@ -61,10 +61,10 @@ struct WaterWidgetView: View {
                 
                 switch widgetFamily {
                     
-                case .systemSmall: Text("\(displayUnitWithPrefixes(amount: entry.widgetWaterAmount)) \(entry.widgetSelectedUnit) of \(displayUnitWithPrefixes(amount: entry.widgetGoalAmount)) \(entry.widgetSelectedUnit)")
+                case .systemSmall: Text("\(displayUnitWithPrefixes(amountML: entry.widgetWaterAmount)) \(entry.widgetSelectedUnit) of \(displayUnitWithPrefixes(amountML: entry.widgetGoalAmount)) \(entry.widgetSelectedUnit)")
                         .foregroundStyle(.cyan).font(.caption)
                     
-                default: Text("\(displayUnitWithPrefixes(amount: entry.widgetWaterAmount)) \(entry.widgetSelectedUnit) of \(displayUnitWithPrefixes(amount: entry.widgetGoalAmount)) \(entry.widgetSelectedUnit)")
+                default: Text("\(displayUnitWithPrefixes(amountML: entry.widgetWaterAmount)) \(entry.widgetSelectedUnit) of \(displayUnitWithPrefixes(amountML: entry.widgetGoalAmount)) \(entry.widgetSelectedUnit)")
                     .foregroundStyle(.cyan).font(.title3)}
                 
                 Spacer()
@@ -78,18 +78,17 @@ struct WaterWidgetView: View {
         }
     }
     
-    func displayUnitWithPrefixes(amount: Double) -> String {
-        if entry.widgetSelectedUnit == "oz" {
-            let stringOz = String(format: "%g", amount).prefix(6)
-            return String(stringOz)
-        } else if entry.widgetSelectedUnit == "L" {
-            let stringL = String(format: "%g", amount).prefix(6)
-            return String(stringL)
-        } else if entry.widgetSelectedUnit == "mL" {
-            let stringmL = String(format: "%g", amount).prefix(7)
-            return String(stringmL)
+    func displayUnitWithPrefixes(amountML: Double) -> String {
+        switch entry.widgetSelectedUnit {
+            case "L":
+                let liters = amountML / 1000
+                return String(format: "%.2f", liters)
+            case "oz":
+                let ounces = amountML / 29.5735
+                return String(format: "%.0f", ounces.rounded())
+            default: // mL
+                return String(format: "%.0f", amountML.rounded())
         }
-        return "oz"
     }
 
 }
