@@ -28,9 +28,10 @@ struct WaterOptionsView: View {
     @AppStorage("customAmountL") private var customAmountL: Double = 0.10
     @AppStorage("customAmountmL") private var customAmountmL: Double = 50
     
-    var goalPercent:Double {
-        let percent = (Double(waterAmountML) / Double(goalAmountML)) * Double(100)
-        return percent
+    var goalPercent: Double {
+        guard goalAmountML > 0 else { return 0 }
+        let percent = (waterAmountML / goalAmountML) * 100
+        return max(0, percent)
     }
     
     var quickAddValue1: String {
@@ -248,6 +249,11 @@ struct WaterOptionsView: View {
                 
             }
         }
+        .onChange(of: waterLogCount) { _, newValue in
+                if newValue == 3 || newValue == 30 || newValue == 100  {
+                    requestReview()
+                }
+        }
     }
     
     var customAmountSliders: some View {
@@ -314,11 +320,7 @@ struct WaterOptionsView: View {
             
         }
         .buttonStyle(.plain)
-        .onChange(of: waterLogCount) { _, newValue in
-                if newValue == 3 || newValue == 30 || newValue == 100  {
-                    requestReview()
-                }
-        }
+       
     }
     
     func logCustomAmount() {
@@ -375,14 +377,22 @@ struct WaterOptionsView: View {
     func saveAllWidgetData() {
         guard let defaults = UserDefaults(suiteName: "group.HydroHabit") else { return }
         
+        let displayPercent = goalPercent >= 100 ? 100.0 : floor(goalPercent)
+        
         defaults.set(waterAmountML, forKey: "widgetWaterAmount")
         defaults.set(goalAmountML, forKey: "widgetGoalAmount")
-        defaults.set(goalPercent, forKey: "widgetGoalPercentage")
+        defaults.set(displayPercent, forKey: "widgetGoalPercentage")
         defaults.set(selectedUnitType, forKey: "widgetSelectedUnit")
         
-        DispatchQueue.global(qos: .background).async {
-                WidgetCenter.shared.reloadTimelines(ofKind: "HydroHabit")
-            }
+        // 1. CHANGE THIS KEY: Use "savedDay" instead of "widgetSavedDay"
+        // This ensures it updates the same @AppStorage variable used in ContentView
+        let today = Calendar.current.startOfDay(for: Date())
+        defaults.set(today, forKey: "savedDay")
+        
+        // 2. REMOVE THIS: defaults.synchronize()
+        // It is no longer needed in modern iOS and can slow things down.
+
+        WidgetCenter.shared.reloadTimelines(ofKind: "HydroHabit")
     }
     
     func convertToML(_ amount: Double) -> Double {

@@ -21,7 +21,6 @@ struct ContentView: View {
         animation: .default
     )
     private var recentEntries: FetchedResults<WaterLog>
-
     
     @State var showWaterOptions = false
     
@@ -35,7 +34,8 @@ struct ContentView: View {
     @State var editGoalSheetShowing = false
     @State var animatedProgress = 0.0
     @Environment(\.scenePhase) var scenePhase
-    @AppStorage("savedDay") var savedDay:Int?
+    @AppStorage("savedDay", store: UserDefaults(suiteName: "group.HydroHabit"))
+    var savedDay: Date?
     //VERY FIRST TIME, STARTS AS CURRENT DAY.
     //every future day gets checked to previous.
     
@@ -54,15 +54,14 @@ struct ContentView: View {
         let percent = (waterAmountML / goalAmountML) * 100
         return max(0, percent)
     }
-    //99.98 rounds up from format: %.0f AND displays the decimal
-    //***to enforce NON rounding formating, use .floor
-    //for example it would say 90.1 is 901 then use floor to stop the automatic format: % rounding, and then use the decimal at the divided by 10 place
-    
+
     var formattedGoalPercent: String {
         if goalPercent >= 100 {
-            return "100" // Directly show 100% when the value is 99.5 or higher
-        }else  {
-            return String(format: "%.0f", goalPercent)
+            return "100"
+        } else {
+            // .floor prevents 99.7 from rounding up to 100.
+            // It slices off the decimal, leaving exactly "99".
+            return String(format: "%.0f", floor(goalPercent))
         }
     }
     
@@ -506,9 +505,13 @@ struct ContentView: View {
     
     func resetDataOnNewDay() {
         let calendar = Calendar.current
-        let currentDay = calendar.component(.day, from: Date())
+        let now = Date()
         
-        if savedDay != currentDay {
+        // Fallback to distantPast if savedDay is nil (first download)
+        let lastResetDate = savedDay ?? .distantPast
+        
+        if !calendar.isDateInToday(lastResetDate) {
+            
             //saved day is never equal to current day on fresh download.
             //therefore every time app opens.. first time on appear, it starts as zero.
             //which i guess is good for immediate first time download.
@@ -522,11 +525,24 @@ struct ContentView: View {
                 animatedProgress = 0
             }
             
+            // Efficient Core Data Deletion
+                    if !recentEntries.isEmpty {
+                        for entry in recentEntries {
+                            moc.delete(entry)
+                        }
+                        // Save ONCE after the loop is done
+                        do {
+                            try moc.save()
+                        } catch {
+                            print("Error clearing history: \(error)")
+                        }
+                    }
+            
             waterAmountML = 0.0
             
-            saveAllWidgetData()
+            savedDay = now
             
-            savedDay = currentDay
+            saveAllWidgetData()
             
             goalScaleAnimationHasBeenShown = false
             
@@ -670,18 +686,22 @@ struct ContentView: View {
     func saveAllWidgetData() {
         guard let defaults = UserDefaults(suiteName: "group.HydroHabit") else { return }
         
+        let displayPercent = goalPercent >= 100 ? 100.0 : floor(goalPercent)
+        
         defaults.set(waterAmountML, forKey: "widgetWaterAmount")
         defaults.set(goalAmountML, forKey: "widgetGoalAmount")
-        defaults.set(goalPercent, forKey: "widgetGoalPercentage")
+        defaults.set(displayPercent, forKey: "widgetGoalPercentage")
         defaults.set(selectedUnitType, forKey: "widgetSelectedUnit")
         
-        // store the last saved day for daily refresh of widget dynamically
-           let today = Calendar.current.startOfDay(for: Date())
-           defaults.set(today, forKey: "widgetSavedDay")
+        // 1. CHANGE THIS KEY: Use "savedDay" instead of "widgetSavedDay"
+        // This ensures it updates the same @AppStorage variable used in ContentView
+        let today = Calendar.current.startOfDay(for: Date())
+        defaults.set(today, forKey: "savedDay")
         
-        DispatchQueue.global(qos: .background).async {
-                WidgetCenter.shared.reloadTimelines(ofKind: "HydroHabit")
-            }
+        // 2. REMOVE THIS: defaults.synchronize()
+        // It is no longer needed in modern iOS and can slow things down.
+
+        WidgetCenter.shared.reloadTimelines(ofKind: "HydroHabit")
     }
 
 }

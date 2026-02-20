@@ -33,38 +33,38 @@ struct WaterProvider: TimelineProvider {
     //gives a snapshot to the widget gallery (where users select the widget to use) featuring generic data.
     //Context just automatically generates for us.
     func getTimeline(in context: Context, completion: @escaping (Timeline<WaterEntry>) -> Void) {
-
         let defaults = UserDefaults(suiteName: "group.HydroHabit")
+        let calendar = Calendar.current
+        let now = Date()
 
+        // 1. Fetch saved data
         let savedWaterAmount = defaults?.double(forKey: "widgetWaterAmount") ?? 0
         let savedGoalAmount = defaults?.double(forKey: "widgetGoalAmount") ?? 0
         let savedUnit = defaults?.string(forKey: "widgetSelectedUnit") ?? "oz"
         let savedGoalPercent = defaults?.double(forKey: "widgetGoalPercentage") ?? 0
-        let lastSavedDay = defaults?.object(forKey: "widgetSavedDay") as? Date ?? Date()
+        let lastSavedDay = defaults?.object(forKey: "savedDay") as? Date ?? Date.distantPast
 
-        let today = Calendar.current.startOfDay(for: Date())
+        // 2. LOGIC: Is the saved data actually from today?
+        // If user opens phone at 10am Tuesday, but last log was 5pm Monday, this ensures 'now' shows 0.
+        let isDataFromToday = calendar.isDate(now, inSameDayAs: lastSavedDay)
+        
+        let currentWater = isDataFromToday ? savedWaterAmount : 0
+        let currentPercent = isDataFromToday ? savedGoalPercent : 0
 
-        // ✅ Reset if lastSavedDay is not today
-        let currentWaterAmount: Double
-        let currentGoalPercent: Double
-        if Calendar.current.isDate(today, inSameDayAs: lastSavedDay) {
-            currentWaterAmount = savedWaterAmount
-            currentGoalPercent = savedGoalPercent
-        } else {
-            currentWaterAmount = 0
-            currentGoalPercent = 0
-        }
-
+        // ENTRY 1: Right Now
         let nowEntry = WaterEntry(
-            date: Date(),
-            widgetWaterAmount: currentWaterAmount,
+            date: now,
+            widgetWaterAmount: currentWater,
             widgetGoalAmount: savedGoalAmount,
             widgetSelectedUnit: savedUnit,
-            widgetGoalPercentage: currentGoalPercent
+            widgetGoalPercentage: currentPercent
         )
 
-        // Next midnight entry
-        let nextMidnight = Calendar.current.date(byAdding: .day, value: 1, to: today)!
+        // ENTRY 2: Exactly at Midnight (The Visual Flip)
+        // This is the "Guarantee." iOS swaps the view at 12:00:00 AM without running code.
+        
+        let nextMidnight = calendar.startOfDay(for: calendar.date(byAdding: .day, value: 1, to: now)!)
+        
         let midnightEntry = WaterEntry(
             date: nextMidnight,
             widgetWaterAmount: 0,
@@ -72,8 +72,20 @@ struct WaterProvider: TimelineProvider {
             widgetSelectedUnit: savedUnit,
             widgetGoalPercentage: 0
         )
+        
+        // ENTRY 3: Safety Net (Midnight of the following day)
+        // Ensures that even if the user doesn't touch the phone for 48 hours, it stays at 0.
+        let dayAfterMidnight = calendar.date(byAdding: .day, value: 1, to: nextMidnight)!
+        let safetyEntry = WaterEntry(
+            date: dayAfterMidnight,
+            widgetWaterAmount: 0,
+            widgetGoalAmount: savedGoalAmount,
+            widgetSelectedUnit: savedUnit,
+            widgetGoalPercentage: 0
+        )
 
-        let timeline = Timeline(entries: [nowEntry, midnightEntry], policy: .atEnd)
+        // .atEnd tells iOS to call getTimeline again once it runs out of these entries.
+        let timeline = Timeline(entries: [nowEntry, midnightEntry, safetyEntry], policy: .atEnd)
         completion(timeline)
     }
 
