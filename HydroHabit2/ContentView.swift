@@ -44,11 +44,13 @@ struct ContentView: View {
     @State var buttonPressed = false
     //used to animate progress circle after pressed
     
-    @State var recentWaterAmountSaved:Double = 0
     @Binding var goalAmountML: Double
-    @AppStorage("goalScaleAnimationHasBeenShown") var goalScaleAnimationHasBeenShown = false
     @State var isAnimating = false
     
+    //@AppStorage("goalScaleAnimationHasBeenShown") var goalScaleAnimationHasBeenShown = false
+    @State var enlargeProgress: Bool = false
+    //@State var scaleForCompletion = false
+       
     var goalPercent: Double {
         guard goalAmountML > 0 else { return 0 }
         let percent = (waterAmountML / goalAmountML) * 100
@@ -66,14 +68,11 @@ struct ContentView: View {
     }
     
     @Binding var selectedUnitType: String
-    @State var enlargeProgress: Bool = false
-    @State var customAmountSaved: Bool = false
-
-    @State var setNewOpacity = false
-    @State var scaleForCompletion = false
     @State var scaleGlowAnimationAmount = 0.0
     @State var scaleEffectForCompletion = false
     @State var displayWellDoneText = false
+    
+    @State var animatedGoalPercent: String = ""
     
     var waterUnits = ["oz", "L", "mL"]
 
@@ -109,7 +108,7 @@ struct ContentView: View {
                                     
                                 }
                                 .onAppear{
-                                    
+                                    animatedGoalPercent = formattedGoalPercent
                                     resetDataOnNewDay()
                                     setAllDataOnAppear()
                                     animatedProgress = goalAmountML > 0 ? min(waterAmountML / goalAmountML, 1.0) : 0
@@ -156,7 +155,9 @@ struct ContentView: View {
                                 
                             }
                         }.padding().background{
-                            RoundedRectangle(cornerRadius: 16).foregroundStyle(.gray).opacity(0.1)
+                            RoundedRectangle(cornerRadius: 16).foregroundStyle(
+                                Color(red: 0.18, green: 0.45, blue: 0.82)
+                            )
                         }
                         
                         HStack {
@@ -171,12 +172,14 @@ struct ContentView: View {
                            
                             if recentEntries.isEmpty {
                                 HStack{
-                                    Text("No recent entries today.").foregroundStyle(.gray).opacity(0.5)
+                                    Text("No recent entries today.").foregroundStyle(.white)
                                     Spacer()
                                 }.frame(maxWidth: .infinity)
                                     .padding()
                                     .background{
-                                        RoundedRectangle(cornerRadius: 16).foregroundStyle(.gray).opacity(0.1)
+                                        RoundedRectangle(cornerRadius: 16).foregroundStyle(
+                                            Color(red: 0.18, green: 0.45, blue: 0.82)
+                                        )
                                     }
                             }else {
                                 
@@ -190,11 +193,14 @@ struct ContentView: View {
                                       
                                             HStack{
                                                 Text("\(displayUnitWithPrefixes(amountML: i.waterAmountML)) \(displayUnitType())")
-                                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                                Text(i.dateSaved ?? Date(), format: .dateTime.hour().minute())
-                                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                                    .frame(maxWidth: .infinity, alignment: .leading).fontWeight(.light)
                                                 
                                                 Spacer()
+                                                
+                                                Text(i.dateSaved ?? Date(), format: .dateTime.hour().minute())
+                                                .fontWeight(.light).font(.caption)
+                                                .frame(width: 70)
+                                              
                                                 
                                                 Button {
                                                     
@@ -205,6 +211,7 @@ struct ContentView: View {
                                                     
                                                     withAnimation {
                                                         animatedProgress = goalAmountML > 0 ? min(waterAmountML / goalAmountML, 1.0) : 0
+                                                        animatedGoalPercent = formattedGoalPercent
                                                         
                                                     }
                                            
@@ -219,22 +226,33 @@ struct ContentView: View {
                                                     
                                                     Image(systemName: "arrow.clockwise")
                                                         .font(.system(size: 16))
+                                                        .overlay(
+                                                                    Rectangle()
+                                                                       
+                                                                        .frame(width: 26, height: 26) // minimum tap target
+                                                                        .opacity(0)                   // invisible
+                                                                        .contentShape(Rectangle())
+                                                                )
                                                     
                                                 }
-                                                .foregroundStyle(.gray)
+                                                .foregroundStyle(.white)
                                                 .opacity(0.5)
+                                                .buttonStyle(.plain)
                                                 
                                             }
                                             .frame(maxWidth: .infinity)
                                             .padding()
                                             .background{
-                                                RoundedRectangle(cornerRadius: 16).foregroundStyle(.gray).opacity(0.1)
+                                                RoundedRectangle(cornerRadius: 16).foregroundStyle(
+                                                    Color(red: 0.18, green: 0.45, blue: 0.82)
+                                                )
+                                                
                                             }
                                             
                                         
                                         
                                     }
-                                }.foregroundStyle(.blue)
+                                }.foregroundStyle(.white)
                                 
                                    
                             }
@@ -281,7 +299,7 @@ struct ContentView: View {
                             showWaterOptions = true
                         } label: {
                             Image(systemName: "plus")
-                                .font(.system(size: 24, weight: .bold))
+                                .font(.system(size: 24))
                                 .foregroundColor(.white)
                                 .frame(width: 50, height: 50)
                                 .contentShape(Circle())
@@ -290,9 +308,15 @@ struct ContentView: View {
                             Group {
                                 if #available(iOS 26.0, *) {
                                     Circle()
+                                        .foregroundStyle(
+                                            .clear
+                                        )
                                         .glassEffect()
                                 } else {
                                     Circle()
+                                        .foregroundStyle(
+                                            .clear
+                                        )
                                         .background(.ultraThinMaterial)
                                 }
                             }
@@ -305,8 +329,9 @@ struct ContentView: View {
                 
             }
             .sheet(isPresented: $showWaterOptions) {
-                WaterOptionsView(selectedUnitType: $selectedUnitType, waterLogCount: $waterLogCount, buttonPressed: $buttonPressed, waterAmountML: $waterAmountML, goalAmountML: $goalAmountML, recentWaterAmountSaved: $recentWaterAmountSaved, customAmountSaved: $customAmountSaved)
+                WaterOptionsView(selectedUnitType: $selectedUnitType, waterLogCount: $waterLogCount, buttonPressed: $buttonPressed, waterAmountML: $waterAmountML, goalAmountML: $goalAmountML)
                     .presentationDetents([.medium])
+                    .presentationDragIndicator(.visible)
             }
         }
     
@@ -381,8 +406,8 @@ struct ContentView: View {
     var backgroundColor: LinearGradient {
         LinearGradient(
             colors: [
-                Color(red: 0.12, green: 0.45, blue: 0.95),   // rich blue
-                Color(red: 0.10, green: 0.12, blue: 0.35)    // deeper blue
+                Color(red: 0.15, green: 0.42, blue: 0.78),  // darker top
+                Color(red: 0.08, green: 0.32, blue: 0.65)   // deeper bottom
             ],
             startPoint: .topLeading,
             endPoint: .bottomTrailing
@@ -391,7 +416,7 @@ struct ContentView: View {
     }
     
     var hydroHabitTitleText: some View {
-        Text("HydroHabit").foregroundStyle(.white).font(.title2).bold()
+        Text("HydroHabit").foregroundStyle(.white).font(.title2).fontWeight(.light)
     }
     
     var changeWaterUnitPicker: some View {
@@ -406,20 +431,22 @@ struct ContentView: View {
             HStack(spacing: 2) {
                 Text(selectedUnitType)
                     .font(.body)
-                    .fontWeight(.medium)
+                    .fontWeight(.light)
                     // This ID forces SwiftUI to "snap" the text change
                     // instead of animating the characters
                     .id(selectedUnitType)
                 
                 Image(systemName: "chevron.down")
-                    .font(.caption2)
+                    
             }
             .padding(.horizontal, 8)
             .padding(.vertical, 4)
-            .background(Color.white.opacity(0.001)) // Increases tap area without visual change
-            .frame(width: 60, alignment: .trailing) // THE FIX: Absolute width
+            //.background(Color.white.opacity(0.001)) // Increases tap area without visual change
+            .font(.caption2)
+            .frame(width: 60, height: 50)
+            .contentShape(Rectangle())
         }
-        .tint(.blue)
+        .tint(.white)
         // This prevents the "Drawing" animation from stuttering
         .transaction { transaction in
             transaction.animation = nil
@@ -438,15 +465,18 @@ struct ContentView: View {
         } label: {
             
             Image(systemName: "square.and.pencil")
-                .font(.system(size: 20, weight: .bold))
+                .font(.system(size: 16))
                 //.contentShape(Rectangle())
+                .frame(width: 30, height: 30)   // tap area
+                           .contentShape(Rectangle())      // whole frame tappable
             
-        }.font(.footnote).foregroundStyle(.gray.opacity(0.3))
+        }.font(.footnote).foregroundStyle(.white.opacity(0.5))
+            .buttonStyle(.plain)
         
     }
     
     var waterAmountOfGoalText: some View {
-        Text("\(displayUnitWithPrefixes(amountML: waterAmountML)) \(displayUnitType()) of \(displayUnitWithPrefixes(amountML: goalAmountML)) \(displayUnitType())").foregroundStyle(.blue).font(.title2).fontWeight(.light)
+        Text("\(displayUnitWithPrefixes(amountML: waterAmountML)) \(displayUnitType()) of \(displayUnitWithPrefixes(amountML: goalAmountML)) \(displayUnitType())").foregroundStyle(.white).font(.title2).fontWeight(.light)
     }
     
     func setAllDataOnAppear() {
@@ -458,50 +488,37 @@ struct ContentView: View {
     
     
     var progressCirclesView: some View {
-        
-        VStack{
-            ZStack {
-                
-                Circle()
-                    .stroke(lineWidth: enlargeProgress ? 10 : 4)
-                    .foregroundStyle(.gray)
-                    .frame(width: 140, height: 140)
-                    .opacity(0.5)
-                
-                Circle().trim(from: 0.0, to: animatedProgress).stroke(lineWidth: enlargeProgress ? 10 : 4).foregroundStyle(.blue).frame(width: 140, height: 140).shadow(color: .blue, radius: 10, x: 0, y: 0).rotationEffect(.degrees(-90))
-                    .overlay(
-                        Circle()
-                            .stroke(lineWidth: 4)
-                            .foregroundStyle(.blue).frame(width: scaleForCompletion && !goalScaleAnimationHasBeenShown ? 3000 : 140, height: scaleForCompletion && !goalScaleAnimationHasBeenShown ? 3000 : 140)
-                            .shadow(color: .blue, radius: 10, x: 0, y: 0)
-                            .rotationEffect(.degrees(-90))
-                            .scaleEffect(scaleForCompletion && !goalScaleAnimationHasBeenShown ? 30 : 1)
-                            .opacity(setNewOpacity ? 0.4 : 0)
-                            .ignoresSafeArea(.all)
-                    )
-            }
+        ZStack {
+            // Gray background ring
+            Circle()
+                              .stroke(lineWidth: enlargeProgress ? 10 : 4)
+                              .foregroundStyle(.gray)
+                              .frame(width: 140, height: 140)
+                              .opacity(0.5)
+                          
+                          Circle().trim(from: 0.0, to: animatedProgress).stroke(lineWidth: enlargeProgress ? 10 : 4).foregroundStyle(.blue).frame(width: 140, height: 140).shadow(color: .blue, radius: 10, x: 0, y: 0).rotationEffect(.degrees(-90))
+            /*
+                              .overlay(
+                                  Circle()
+                                      .stroke(lineWidth: 4)
+                                      .foregroundStyle(.blue).frame(width: 140, height:140)
+                                      .shadow(color: .blue, radius: 10, x: 0, y: 0)
+                                      .rotationEffect(.degrees(-90))
+                                      .scaleEffect(1)
+                                      .opacity(setNewOpacity ? 0.4 : 0)
+                                      .ignoresSafeArea(.all)
+                              )
+             */
         }
     }
     
     var progressPercentageInCircle: some View {
         
-        Text("\(formattedGoalPercent)%").foregroundStyle(.blue).font(.title).bold().shadow(color: .blue, radius: 10, x: 0, y: 0)
-        
-        //Image(systemName: "drop").foregroundStyle(.blue).font(.title).padding(.bottom, 10).bold().shadow(color: .blue, radius: 10, x: 0, y: 0)
+        Text("\(animatedGoalPercent)%").foregroundStyle(.white).font(.title).fontWeight(.light).shadow(color: Color.black.opacity(0.15), radius: 4, x: 0, y: -2)
+            .animation(.default, value: goalPercent)
+            
+
     }
-    
-    //12:01am log entry, saved day is -1, i close app, i reopen, saved day is still -1, so saved day isn't equal to current day, so resets.
-    //bug: if you haven't logged in a day, first entry resets to zero.
-    //11:59pm open, but its reset to zero.
-    //only on resets is savedData getting saved.
-    
-    //log entry and save current date.
-    //tomorrow, its a new day.
-    //as soon as the app appears or comes back to active scene, saved day (yesterday) will compare to new day to reset, before anything gets logged, instantly.
-    
-    //saved day button save didn't work. breaks widget resets to zero constantly.
-    
-    //make sure glow works correct on new day.
     
     func resetDataOnNewDay() {
         let calendar = Calendar.current
@@ -511,16 +528,7 @@ struct ContentView: View {
         let lastResetDate = savedDay ?? .distantPast
         
         if !calendar.isDateInToday(lastResetDate) {
-            
-            //saved day is never equal to current day on fresh download.
-            //therefore every time app opens.. first time on appear, it starts as zero.
-            //which i guess is good for immediate first time download.
-            //but i didn't have an immediate reloadTimes save.
-            //this runs ONLY on appear.
-            //but i did have reload on waterAmount change right? yes.
-            
-            goalScaleAnimationHasBeenShown = false
-            
+
             withAnimation{
                 animatedProgress = 0
             }
@@ -544,135 +552,36 @@ struct ContentView: View {
             
             saveAllWidgetData()
             
-            goalScaleAnimationHasBeenShown = false
+        
             
         }
     }
-    
-    /*
-    
-    func updateAmountsAfterUnitConversion (oldValue: String, newValue: String) {
-        if oldValue == "oz" && newValue == "L" {
-            
-            self.waterAmount = waterAmount * 0.0295735
-            self.goalAmount = goalAmount * 0.0295735
-       
-        } else if oldValue == "oz" && newValue == "mL" {
-            
-            self.waterAmount = waterAmount * 29.5735
-            self.goalAmount = goalAmount * 29.5735
-            
-        } else if oldValue == "L" && newValue == "oz" {
-           
-            self.waterAmount = waterAmount * 33.814
-            self.goalAmount = goalAmount * 33.814
-       
-        } else if oldValue == "L" && newValue == "mL" {
-            
-            self.waterAmount = waterAmount * 1000
-            self.goalAmount = goalAmount * 1000
-            
-        } else if oldValue == "mL" && newValue == "L" {
-            
-            self.waterAmount = waterAmount / 1000
-            self.goalAmount = goalAmount / 1000
-            
-        } else if oldValue == "mL" && newValue == "oz" {
-            
-            self.waterAmount = waterAmount / 29.5735
-            self.goalAmount = goalAmount / 29.5735
-       
-        }
-        
-        
-    }
-    
-    func updateRecentEntriesAfterUnitConversion (for log: WaterLog, oldValue: String, newValue: String) {
-        if oldValue == "oz" && newValue == "L" {
-            
-            log.waterAmount = log.waterAmount * 0.0295735
-       
-        } else if oldValue == "oz" && newValue == "mL" {
-            
-            log.waterAmount = log.waterAmount * 29.5735
-            
-        } else if oldValue == "L" && newValue == "oz" {
-            
-            log.waterAmount = log.waterAmount * 33.814
-       
-        } else if oldValue == "L" && newValue == "mL" {
-            
-            log.waterAmount = log.waterAmount  * 1000
-            
-        } else if oldValue == "mL" && newValue == "L" {
-            
-            log.waterAmount = log.waterAmount / 1000
-            
-        } else if oldValue == "mL" && newValue == "oz" {
-            
-            log.waterAmount = log.waterAmount / 29.5735
-       
-        }
-        
-        
-    }
-    
-    */
     
     func animateButtonsAndProgressCircle() {
         
-        
-        withAnimation {
-            enlargeProgress = true
-        }
-        
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            // Code to execute after 2 seconds
-            withAnimation{
-                animatedProgress = goalAmountML > 0 ? min(waterAmountML / goalAmountML, 1.0) : 0
-            }
-        }
-
             
-        if goalPercent >= 100 && !goalScaleAnimationHasBeenShown  && !isAnimating {
-            isAnimating = true
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                setNewOpacity = true
-                withAnimation(.easeInOut(duration: 5.0)){
-                    scaleForCompletion = true
+            withAnimation {
+                enlargeProgress = true
+            }
+            
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                // Code to execute after 2 seconds
+                withAnimation{
+                    animatedProgress = goalAmountML > 0 ? min(waterAmountML / goalAmountML, 1.0) : 0
+                    animatedGoalPercent = formattedGoalPercent
                 }
             }
             
-            DispatchQueue.main.asyncAfter(deadline: .now() + 5.1) {
-                    goalScaleAnimationHasBeenShown = true
-                    scaleForCompletion = false
-                    setNewOpacity = false
-                isAnimating = false
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                withAnimation{
+                    enlargeProgress = false
+                }
             }
         }
         
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-            withAnimation{
-                enlargeProgress = false
-            }
-            
-            customAmountSaved = false
-           
-        }
     }
-    
-    /*
-    func setDefaultCustomAmountOnUnitChange() {
-        if selectedUnitType == "oz" {
-            customAmount = 10
-        } else if selectedUnitType == "L" {
-            customAmount = 0.10
-        } else if selectedUnitType == "mL" {
-            customAmount = 50
-        }
-    }
-    */
     
     func checkForReviewTrigger() {
         if waterLogCount == 3 ||

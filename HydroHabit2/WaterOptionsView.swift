@@ -21,8 +21,6 @@ struct WaterOptionsView: View {
     @Binding var buttonPressed: Bool
     @Binding var waterAmountML: Double
     @Binding var goalAmountML: Double
-    @Binding var recentWaterAmountSaved: Double
-    @Binding var customAmountSaved: Bool
     
     @AppStorage("customAmountOz") private var customAmountOz: Double = 10
     @AppStorage("customAmountL") private var customAmountL: Double = 0.10
@@ -69,29 +67,6 @@ struct WaterOptionsView: View {
     
     var body: some View {
         ZStack{
-
-                VStack{
-                    HStack{
-                        
-                        Spacer()
-                        
-                        Button{
-                            
-                            dismiss()
-                            
-                        }label:{
-                            
-                            Image(systemName: "xmark")
-                                .font(.system(size: 24))
-                                .foregroundStyle(.white)
-                                .frame(width: 50, height: 50)
-                                .contentShape(Rectangle())            // makes the tap area circular
-                            
-                        }
-                        
-                    }.padding([.trailing, .top])
-                    Spacer()
-                }
                 
             VStack{
                
@@ -111,7 +86,7 @@ struct WaterOptionsView: View {
                         saveAllWidgetData()
                         
                     
-                        recentWaterAmountSaved = Double(quickAddValue1) ?? 0
+                     
                         
                         let newItem = WaterLog(context: moc)
                         newItem.id = UUID()
@@ -134,7 +109,8 @@ struct WaterOptionsView: View {
                                 
                                 
                                 Text("\(quickAddValue1)\(displayUnitType())")
-                                    .font(.caption2.bold())
+                                    .font(.caption)
+                                    .fontWeight(.light)
                                     .foregroundColor(.white)
                             }
                         }
@@ -155,7 +131,7 @@ struct WaterOptionsView: View {
                         saveAllWidgetData()
                         
                   
-                        recentWaterAmountSaved = Double(quickAddValue2) ?? 0
+                     
                         
                         let newItem = WaterLog(context: moc)
                         newItem.id = UUID()
@@ -179,7 +155,8 @@ struct WaterOptionsView: View {
                                 
                                 
                                 Text("\(quickAddValue2)\(displayUnitType())")
-                                    .font(.caption2.bold())
+                                    .font(.caption)
+                                    .fontWeight(.light)
                                     .foregroundColor(.white)
                             }
                         }
@@ -200,7 +177,7 @@ struct WaterOptionsView: View {
                         saveAllWidgetData()
                         
                    
-                        recentWaterAmountSaved = Double(quickAddValue3) ?? 0
+               
                         
                         let newItem = WaterLog(context: moc)
                         newItem.id = UUID()
@@ -226,7 +203,8 @@ struct WaterOptionsView: View {
                                 
                                 
                                 Text("\(quickAddValue3)\(displayUnitType())")
-                                    .font(.caption2.bold())
+                                    .font(.caption)
+                                    .fontWeight(.light)
                                     .foregroundColor(.white)
                             }
                         }
@@ -308,10 +286,10 @@ struct WaterOptionsView: View {
         }label:{
             
             Image(systemName: "checkmark")
-                .font(.system(size: 24))
+                .font(.system(size: 16))
                 
                 .foregroundStyle(.white)
-                .frame(width: 50, height: 50)
+                .frame(width: 30, height: 30)
                 .background(
                             Circle()
                                 .fill(Color.blue.opacity(0.4))
@@ -327,7 +305,6 @@ struct WaterOptionsView: View {
         
         waterLogCount += 1
         buttonPressed.toggle()
-        customAmountSaved = true
         
         // 1️⃣ Determine slider value based on unit
         let valueToLog: Double = {
@@ -346,9 +323,6 @@ struct WaterOptionsView: View {
         
         // 4️⃣ Save widget data
         saveAllWidgetData()
-        
-        // 5️⃣ Save recent amount (store mL, not unit value)
-        recentWaterAmountSaved = amountML
         
         // 6️⃣ CoreData log (store mL only)
         let newItem = WaterLog(context: moc)

@@ -65,7 +65,9 @@ struct FirstLaunchView: View {
                                     .frame(width: 200, height: 50)
                                     .background(
                                         RoundedRectangle(cornerRadius: 12)
-                                            .fill(Color(red: 59/255, green: 89/255, blue: 152/255))
+                                            .fill(
+                                                Color(red: 0.18, green: 0.45, blue: 0.82)
+                                            )
                                     )
                             }
                             .buttonStyle(.plain)
@@ -96,7 +98,9 @@ struct FirstLaunchView: View {
                                     .frame(width: 200, height: 50)
                                     .background(
                                         RoundedRectangle(cornerRadius: 12)
-                                            .fill(Color(red: 59/255, green: 89/255, blue: 152/255))
+                                            .fill(
+                                                Color(red: 0.18, green: 0.45, blue: 0.82)
+                                            )
                                     )
                             }
                             .buttonStyle(.plain)
@@ -131,7 +135,9 @@ struct FirstLaunchView: View {
                                     .frame(width: 200, height: 50)
                                     .background(
                                         RoundedRectangle(cornerRadius: 12)
-                                            .fill(Color(red: 59/255, green: 89/255, blue: 152/255))
+                                            .fill(
+                                                Color(red: 0.18, green: 0.45, blue: 0.82)
+                                            )
                                     )
                             }
                             .buttonStyle(.plain)
@@ -173,7 +179,9 @@ struct FirstLaunchView: View {
                                     .frame(width: 200, height: 50)
                                     .background(
                                         RoundedRectangle(cornerRadius: 12)
-                                            .fill(Color(red: 59/255, green: 89/255, blue: 152/255))
+                                            .fill(
+                                                Color(red: 0.18, green: 0.45, blue: 0.82)
+                                            )
                                     )
                             }
                             .buttonStyle(.plain)
@@ -193,11 +201,13 @@ struct FirstLaunchView: View {
                     ScrollView{
                         VStack{
                             
-                            Text("You’re all set! Your hydration journey starts now.").foregroundStyle(.white).fontWeight(.light).font(.title3)
-                            
-                            Image("beachChair")
-                                .resizable()
-                                .frame(width: 350, height: 350)
+                            VStack{
+                                Text("You’re all set! Your hydration journey starts now.").foregroundStyle(.white).fontWeight(.light).font(.title3)
+                                
+                                Image("beachChair")
+                                    .resizable()
+                                    .frame(width: 300, height: 300)
+                            }.frame(height: 370).padding(.top, 30)
                             
                             Spacer()
                             
@@ -211,7 +221,9 @@ struct FirstLaunchView: View {
                                     .frame(width: 200, height: 50)
                                     .background(
                                         RoundedRectangle(cornerRadius: 12)
-                                            .fill(Color(red: 59/255, green: 89/255, blue: 152/255))
+                                            .fill(
+                                                Color(red: 0.18, green: 0.45, blue: 0.82)
+                                            )
                                     )
                             }
                             .buttonStyle(.plain)
@@ -220,7 +232,7 @@ struct FirstLaunchView: View {
                             Spacer()
                                 .frame(height: 300)
                             
-                        }.frame(minHeight: UIScreen.main.bounds.height).padding(.top, 100)
+                        }.frame(minHeight: UIScreen.main.bounds.height).padding(.top, 70)
                     }.scrollDisabled(true)
                 }.tag(4)
                     
@@ -435,8 +447,8 @@ struct FirstLaunchView: View {
     var backgroundColor: LinearGradient {
         LinearGradient(
             colors: [
-                Color(red: 0.12, green: 0.45, blue: 0.95),   // rich blue
-                Color(red: 0.10, green: 0.12, blue: 0.35)    // deeper blue
+                Color(red: 0.15, green: 0.42, blue: 0.78),  // darker top
+                Color(red: 0.08, green: 0.32, blue: 0.65)   // deeper bottom
             ],
             startPoint: .topLeading,
             endPoint: .bottomTrailing
